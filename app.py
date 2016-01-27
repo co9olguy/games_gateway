@@ -11,11 +11,11 @@ def index():
   return render_template('index.html','figure1.html','figure2.html')
   
 @app.route('/figure1')
-def index():
+def figure1():
   return render_template('figure1.html')
   
 @app.route('/figure2')
-def index():
+def figure2():
   return render_template('figure2.html')  
 
 if __name__ == '__main__':
