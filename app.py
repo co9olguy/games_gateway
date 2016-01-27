@@ -8,7 +8,7 @@ def main():
 
 @app.route('/index')
 def index():
-  return render_template('index.html','figure1.html','figure2.html')
+  return render_template('index.html')
   
 @app.route('/figure1')
 def figure1():
