@@ -38,13 +38,17 @@ def figure2():
     #return url_for('static', filename='figure2.html')
     return render_template('figure2b.html')  
    
+@app.route('/game_ratings')
+def game_ratings():
+    return render_template('game_ratings.html')
+   
 @app.route('/rec_demo1')
 def rec_demo1():
     return render_template('recommendation_demo_Core Eurogamer_top1000.html')     
       
-@app.route('/rec_demo2')
-def rec_demo2():
-    return render_template('recommendation_demo_Complex Eurogamer_top1000.html')     
+#@app.route('/rec_demo2')
+#def rec_demo2():
+#    return render_template('recommendation_demo_Complex Eurogamer_top1000.html')     
       
 @app.route('/rec_demo3')
 def rec_demo3():
