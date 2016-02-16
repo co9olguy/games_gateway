@@ -37,10 +37,36 @@ def figure2():
 #  return render_template('figure1.html', script=script2, div=div2)  
     #return url_for('static', filename='figure2.html')
     return render_template('figure2b.html')  
-    
+   
 @app.route('/rec_demo1')
 def rec_demo1():
+    return render_template('recommendation_demo_Core Eurogamer_top1000.html')     
+      
+@app.route('/rec_demo2')
+def rec_demo2():
+    return render_template('recommendation_demo_Complex Eurogamer_top1000.html')     
+      
+@app.route('/rec_demo3')
+def rec_demo3():
+    return render_template('recommendation_demo_War Gamer_top1000.html')     
+   
+@app.route('/rec_demo4')
+def rec_demo4():
+    return render_template('recommendation_demo_Family Eurogamer_kickstarter.html')    
+
+@app.route('/rec_demo5')
+def rec_demo5():
+    return render_template('recommendation_demo_Family Eurogamer_dinosaurs.html')   
+
+@app.route('/rec_demo6')
+def rec_demo6():
+    return render_template('recommendation_demo_Family Eurogamer_sherlock_holmes.html')   
+    
+@app.route('/rec_demo7')
+def rec_demo7():
     return render_template('recommendation_demo_Joke Game Fan_.html')
+    
+    
 
 if __name__ == '__main__':
   app.run(port=33507)
