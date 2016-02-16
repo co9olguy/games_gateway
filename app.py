@@ -50,6 +50,10 @@ def rec_demo1():
 #def rec_demo2():
 #    return render_template('recommendation_demo_Complex Eurogamer_top1000.html')     
       
+@app.route('/rec_demo2')
+def rec_demo2():
+    return render_template('recommendation_demo_Family_starwars_trivia.html')       
+      
 @app.route('/rec_demo3')
 def rec_demo3():
     return render_template('recommendation_demo_War Gamer_.html')     
