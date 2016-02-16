@@ -48,7 +48,7 @@ def rec_demo2():
       
 @app.route('/rec_demo3')
 def rec_demo3():
-    return render_template('recommendation_demo_War Gamer_top1000.html')     
+    return render_template('recommendation_demo_War Gamer_.html')     
    
 @app.route('/rec_demo4')
 def rec_demo4():
