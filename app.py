@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, jsonify
 
 app = Flask(__name__)
 
@@ -27,7 +27,25 @@ def main():
 @app.route('/index')
 def index():
   return render_template('index.html')
+
+@app.route('/recommender_dev')
+def rec_demo():
+  return render_template('recdev.html')
   
+@app.route('/_add_numbers')
+def add_numbers():
+    a = request.args.get('a', 0, type=int)
+    b = request.args.get('b', 0, type=int)
+    return jsonify(result=a + b)
+    
+@app.route('/_test')
+def test():
+    minplayers = request.args.get('minplayers', type=int)
+    maxplayers = request.args.get('maxplayers', type=int)
+    minplaytime = request.args.get('minplaytime', type=int)
+    maxplaytime = request.args.get('maxplaytime', type=int)
+    return jsonify(result=minplayers)    
+    
 @app.route('/figure1')
 def figure1():
   return render_template('figure1.html', script=script1, div=div1)
@@ -45,10 +63,6 @@ def game_ratings():
 @app.route('/rec_demo1')
 def rec_demo1():
     return render_template('recommendation_demo_Core Eurogamer_top1000.html')     
-      
-#@app.route('/rec_demo2')
-#def rec_demo2():
-#    return render_template('recommendation_demo_Complex Eurogamer_top1000.html')     
       
 @app.route('/rec_demo2')
 def rec_demo2():

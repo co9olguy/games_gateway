@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>jQuery UI Slider - Colorpicker</title>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <script type=text/javascript>
+  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+  </script>
+  <script>
+  
+  //player-range slider
+  $(function() {
+    $( "#player-range" ).slider({
+      range: true,
+      min: 1,
+      max: 15,
+      values: [ 2, 4 ],
+      slide: function( event, ui ) {
+        $( "#player-amount" ).val( ui.values[ 0 ] + " - " + ui.values[ 1 ] );
+      }
+    });
+    $( "#player-amount" ).val( $( "#player-range" ).slider( "values", 0 ) +
+      " - " + $( "#player-range" ).slider( "values", 1 ) );
+  });
+  
+  $(function() {
+    $( "#time-range" ).slider({
+      range: true,
+      min: 0,
+      max: 600,
+      values: [ 30, 60 ],
+      step: 15,
+      slide: function( event, ui ) {
+        $( "#time-amount" ).val( ui.values[ 0 ] + " - " + ui.values[ 1 ] );
+      }
+    });
+    $( "#time-amount" ).val( $( "#time-range" ).slider( "values", 0 ) +
+      " - " + $( "#time-range" ).slider( "values", 1 ) );
+  });  
+
+  $(function() {
+    $( "#submit-button" ).click(function() {
+      $.getJSON($SCRIPT_ROOT + '/_test', {
+        minplayers: $( "#player-range" ).slider( "values", 0 ),
+        maxplayers: $( "#player-range" ).slider( "values", 1 ),
+        minplaytime: $( "#time-range" ).slider( "values", 0 ),
+        maxplaytime: $( "#time-range" ).slider( "values", 1 )        
+      }, function(data) {
+        $("#result").text(data.result);
+      });
+      return false;
+    });
+  });
+  
+  </script>
+</head>
+<body class="ui-widget-content" style="border:0;">
+
+<div>
+ 
+<p>
+  <label for="player-amount">Number of players:</label>
+  <input type="text" id="player-amount" readonly style="border:0; color:#000000; font-weight:bold; width:50px; background-color:transparent;">
+</p>
+<div id="player-range" style="width:200px"></div> 
+
+<p>
+  <label for="time-amount">Time range (min):</label>
+  <input type="text" id="time-amount" readonly style="border:0; color:#000000; font-weight:bold; width:70px; background-color:transparent;">
+</p>
+<div id="time-range" style="width:200px"></div>
+
+</div>
+
+
+
+<br>
+<button id="submit-button">Submit</button>
+<span id="result">Recommendations</span>
+ 
+</body>
+</html>
