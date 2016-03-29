@@ -16,8 +16,17 @@ script2 ='\n<script type="text/javascript">\n    Bokeh.$(function() {\n    var d
 div2='\n<div class="plotdiv" id="3cf48c60-69f3-43c5-8623-7d6dbb2bd743"></div>'
 
 
-
-
+def get_filtered_games(filter):
+  import sqlite3
+  import os
+  import pandas as pd
+  BGG_DB_DIRECTORY = '../bgg_data/sql'
+  games_db_file = os.path.join(BGG_DB_DIRECTORY,'bgg2.sqlite')
+  conn = sqlite3.connect(games_db_file)
+  query = "SELECT * FROM games JOIN boardgamecategory ON games.objectid = boardgamecategory.objectid WHERE minplayers >= {} AND maxplayers <= {} AND minplaytime >= {} AND maxplaytime <= {} AND minage >= {} AND boardgamecategory == '{}'".format(filter['minplayers'], filter['maxplayers'], filter['minplaytime'],filter['maxplaytime'], filter['minage'], filter['category'])
+  print query
+  filtered_games = pd.read_sql_query(query, conn)
+  return filtered_games
 
 
 @app.route('/')
@@ -30,21 +39,25 @@ def index():
 
 @app.route('/recommender_dev')
 def rec_demo():
-  return render_template('recdev.html')
-  
-@app.route('/_add_numbers')
-def add_numbers():
-    a = request.args.get('a', 0, type=int)
-    b = request.args.get('b', 0, type=int)
-    return jsonify(result=a + b)
-    
-@app.route('/_test')
-def test():
-    minplayers = request.args.get('minplayers', type=int)
-    maxplayers = request.args.get('maxplayers', type=int)
-    minplaytime = request.args.get('minplaytime', type=int)
-    maxplaytime = request.args.get('maxplaytime', type=int)
-    return jsonify(result=minplayers)    
+  return render_template('recommender.html')
+
+@app.route('/_recommend')
+def recommend():
+    #apply filters based on user selections
+    filter = {}
+    filter['minplayers'] = request.args.get('minplayers', type=int)
+    filter['maxplayers'] = request.args.get('maxplayers', type=int)
+    filter['minplaytime'] = request.args.get('minplaytime', type=int)
+    filter['maxplaytime'] = request.args.get('maxplaytime', type=int)
+    filter['minage'] = request.args.get("minage", type=int)
+    filter['category'] = request.args.get('category', None, type=str)
+    filtered_games = get_filtered_games(filter)
+
+    #recommender logic goes here...
+
+
+    sample_return_string = filtered_games.head().to_string()
+    return jsonify(result=sample_return_string)
     
 @app.route('/figure1')
 def figure1():
@@ -52,7 +65,7 @@ def figure1():
   
 @app.route('/figure2')
 def figure2():
-#  return render_template('figure1.html', script=script2, div=div2)  
+#  return render_template('figure1.html', script=script2, div=div2)
     #return url_for('static', filename='figure2.html')
     return render_template('figure2b.html')  
    
