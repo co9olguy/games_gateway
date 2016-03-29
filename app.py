@@ -23,7 +23,7 @@ def get_filtered_games(filter):
   BGG_DB_DIRECTORY = '../bgg_data/sql'
   games_db_file = os.path.join(BGG_DB_DIRECTORY,'bgg2.sqlite')
   conn = sqlite3.connect(games_db_file)
-  query = "SELECT * FROM games JOIN boardgamecategory ON games.objectid = boardgamecategory.objectid WHERE minplayers >= {} AND maxplayers <= {} AND minplaytime >= {} AND maxplaytime <= {} AND minage >= {} AND boardgamecategory == '{}'".format(filter['minplayers'], filter['maxplayers'], filter['minplaytime'],filter['maxplaytime'], filter['minage'], filter['category'])
+  query = "SELECT * FROM games JOIN boardgamecategory ON games.objectid = boardgamecategory.objectid JOIN boardgamefamily ON games.objectid = boardgamefamily.objectid WHERE minplayers >= {} AND maxplayers <= {} AND minplaytime >= {} AND maxplaytime <= {} AND minage >= {} AND boardgamecategory == '{}' AND boardgamefamily = '{}'".format(filter['minplayers'], filter['maxplayers'], filter['minplaytime'],filter['maxplaytime'], filter['minage'], filter['category'], filter['family'])
   print query
   filtered_games = pd.read_sql_query(query, conn)
   return filtered_games
@@ -51,6 +51,7 @@ def recommend():
     filter['maxplaytime'] = request.args.get('maxplaytime', type=int)
     filter['minage'] = request.args.get("minage", type=int)
     filter['category'] = request.args.get('category', None, type=str)
+    filter['family'] = request.args.get('family',None, type=str)
     filtered_games = get_filtered_games(filter)
 
     #recommender logic goes here...
