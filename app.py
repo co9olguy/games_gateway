@@ -1,3 +1,4 @@
+import numpy as np
 from flask import Flask, render_template, request, redirect, jsonify
 
 app = Flask(__name__)
@@ -16,18 +17,89 @@ script2 ='\n<script type="text/javascript">\n    Bokeh.$(function() {\n    var d
 div2='\n<div class="plotdiv" id="3cf48c60-69f3-43c5-8623-7d6dbb2bd743"></div>'
 
 
-def get_filtered_games(filter):
+def get_filtered_games(filter_dict):
   import sqlite3
   import os
   import pandas as pd
   BGG_DB_DIRECTORY = '../bgg_data/sql'
   games_db_file = os.path.join(BGG_DB_DIRECTORY,'bgg2.sqlite')
   conn = sqlite3.connect(games_db_file)
-  query = "SELECT * FROM games JOIN boardgamecategory ON games.objectid = boardgamecategory.objectid JOIN boardgamefamily ON games.objectid = boardgamefamily.objectid WHERE minplayers >= {} AND maxplayers <= {} AND minplaytime >= {} AND maxplaytime <= {} AND minage >= {} AND boardgamecategory == '{}' AND boardgamefamily = '{}'".format(filter['minplayers'], filter['maxplayers'], filter['minplaytime'],filter['maxplaytime'], filter['minage'], filter['category'], filter['family'])
-  print query
-  filtered_games = pd.read_sql_query(query, conn)
+  #query = "SELECT * FROM games JOIN boardgamecategory ON games.objectid = boardgamecategory.objectid JOIN boardgamefamily ON games.objectid = boardgamefamily.objectid JOIN ranks ON games.objectid = ranks.objectid WHERE rank != 'Not Ranked' AND ranking_name = 'boardgame' AND minplayers >= {} AND maxplayers <= {} AND minplaytime >= {} AND maxplaytime <= {} AND minage >= {}".format(filter_dict['minplayers'], filter_dict['maxplayers'], filter_dict['minplaytime'],filter_dict['maxplaytime'], filter_dict['minage'])
+
+  q1 = "SELECT * FROM games JOIN ranks ON games.objectid = ranks.objectid"
+  q2 = " WHERE rank != 'Not Ranked' AND ranking_name = 'boardgame' AND minplayers <= {} AND maxplayers >= {} AND minplaytime >= {} AND maxplaytime <= {} AND minage >= {}".format(filter_dict['minplayers'], filter_dict['maxplayers'], filter_dict['minplaytime'],filter_dict['maxplaytime'], filter_dict['minage'])
+
+  if filter_dict['category']:
+      #query += ' AND boardgamecategory == "{}"'.format(filter_dict['category'])
+      q1 += ' JOIN boardgamecategory ON games.objectid = boardgamecategory.objectid'
+      q2 += ' AND boardgamecategory == "{}"'.format(filter_dict['category'])
+
+  if filter_dict['family']:
+      #query += ' AND boardgamefamily == "{}"'.format(filter_dict['family'])
+      q1 += ' JOIN boardgamefamily ON games.objectid = boardgamefamily.objectid'
+      q2 += ' AND boardgamefamily == "{}"'.format(filter_dict['family'])
+
+  qq = q1+ q2
+
+  filtered_games = pd.read_sql_query(qq, conn)
   return filtered_games
 
+from bokeh.plotting import figure, show, output_file, ColumnDataSource
+from bokeh.embed import components
+
+def parse_players(players_df):
+    min_players = players_df['minplayers'].astype(str)
+    max_players = players_df['maxplayers'].astype(str)
+    players_str = min_players + "-" + max_players + ' players'
+    return players_str
+
+def parse_playtime(players_df, minmax = False):
+    min_playtime = players_df['minplaytime'].astype(str)
+    max_playtime = players_df['maxplaytime'].astype(str)
+    if minmax:
+        playtime_str = min_playtime + "-" + max_playtime + ' minutes'
+    else:
+        playtime_str = max_playtime + ' minutes'
+    return playtime_str
+
+def create_recs_page(recs_df, show_page=True):
+
+    #display variables
+    margin = 0.05
+    text_margin = 0.1
+    size = 1-2*margin
+    N=6
+
+    #get data from dataframe
+    game_imgs = recs_df['thumbnail'].apply(lambda s: 'http:'+s)
+    game_names = recs_df['name'] #.apply(lambda s: s.decode('utf-8'))
+    numplayers = parse_players(recs_df)
+    playtimes = parse_playtime(recs_df)
+
+    #prepare html page and bokeh "plot"
+    html_filename = 'recs/recommendations.html'
+    output_file(html_filename, title = "Your Games Recommendations")
+
+    p = figure(x_range=(0-margin,5+margin), y_range=(0-margin,N+margin), height = 200*N, width = 1000,tools=[],title="Game recommendations")
+    x_locs = [margin]*N
+    y_locs = [N-margin-ctr for ctr in range(0,N)]
+
+    p.axis.visible = None
+    p.grid.grid_line_color = None
+    p.logo = None
+    p.toolbar_location = None
+
+    p.image_url(url = game_imgs, x = x_locs, y = y_locs, w = size, h = size)
+    p.text(x=np.array(x_locs) + size + margin*2, y=np.array(y_locs)-size/2+text_margin, text=game_names, text_baseline = 'middle', text_font_style = 'bold') #game names/years
+    p.text(x=np.array(x_locs) + size + margin*2, y=np.array(y_locs)-size/2, text=numplayers, text_baseline = 'middle') #game player limits
+    p.text(x=np.array(x_locs) + size + margin*2, y=np.array(y_locs)-size/2-text_margin, text=playtimes, text_baseline = 'middle') #game playtimes
+
+    #if show_page:
+    #    show(p)
+
+    script, div = components(p)
+
+    return script, div
 
 @app.route('/')
 def main():
@@ -51,14 +123,22 @@ def recommend():
     filter['maxplaytime'] = request.args.get('maxplaytime', type=int)
     filter['minage'] = request.args.get("minage", type=int)
     filter['category'] = request.args.get('category', None, type=str)
-    filter['family'] = request.args.get('family',None, type=str)
+    filter['family'] = request.args.get('family', None, type=str)
     filtered_games = get_filtered_games(filter)
 
     #recommender logic goes here...
+    #for the moment, just recommend top games
+    rec_games = filtered_games.sort_values(by='rank')[0:10]
 
+    #display results
+    if rec_games.empty:
+        return jsonify(result = 'Nothing here', return_string = 'No games found matching your criteria', flag=-1)
 
-    sample_return_string = filtered_games.head().to_string()
-    return jsonify(result=sample_return_string)
+    else:
+        script,div = create_recs_page(rec_games)
+        return_string = rec_games.head().to_string()
+
+        return jsonify(result=render_template('recommendation_demo.html', script=script, div=div), return_string=return_string, flag=0)
     
 @app.route('/figure1')
 def figure1():
