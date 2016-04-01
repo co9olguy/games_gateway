@@ -35,7 +35,7 @@
       range: true,
       min: 0,
       max: 600,
-      values: [ 30, 60 ],
+      values: [ 30, 600 ],
       step: 15,
       slide: function( event, ui ) {
         $( "#time-amount" ).val( ui.values[ 0 ] + " - " + ui.values[ 1 ] );
@@ -61,16 +61,28 @@
   //submit button
   $(function() {
     $( "#submit-button" ).click(function() {
-      $.getJSON($SCRIPT_ROOT + '/_recommend', {
-        minplayers: $( "#player-range" ).slider( "values", 0 ),
+      $.getJSON(
+      $SCRIPT_ROOT + '/_recommend',
+      { minplayers: $( "#player-range" ).slider( "values", 0 ),
         maxplayers: $( "#player-range" ).slider( "values", 1 ),
         minplaytime: $( "#time-range" ).slider( "values", 0 ),
         maxplaytime: $( "#time-range" ).slider( "values", 1 ),
         minage: $( "#minage-slider" ).slider( "values", 0 ),
         category: $( "#categories" ).val(),
         family: $( "#families" ).val()
-      }, function(data) {
-        $("#result").text(data.result);
+      },
+      //this is the code to write a returned string to the "result" field
+      function( data ) {
+        // $("#result").text( data.return_string); // for updating page in-place
+        // attempt to open a new page based on returned html
+        // ugly hacky solution, but it works
+        if ( data.flag == 0 ){
+          //var x = $( "#categories" ).val()
+          //console.log(x)
+          var html = data.result;
+          var uri = "data:text/html," + encodeURIComponent(html);
+          var newWindow = window.open(uri);
+        }
       });
       return false;
     });
@@ -102,17 +114,23 @@
 
 </div>
 
+<br>
+
 <label for="categories">Board game category: </label>
   <input id="categories">
-
+<br>
+<br>
 <label for="families">Board game family: </label>
   <input id="families">
 
 <br>
+<br>
 <button id="submit-button">Submit</button>
 
 <br>
-<div>Your recommendations: <span id="result"></span></div>
+<br>
+
+<!--<div>Your recommendations: <span id="result"></span></div>-->
 
  
 </body>
