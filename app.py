@@ -69,6 +69,16 @@ def get_filtered_games(filter_dict):
 
   return filtered_games2
 
+def get_filtered_games_heroku(filter_dict):
+
+  test_query = "SELECT * FROM games WHERE minplayers <= {} AND maxplayers >= {} AND minplaytime >= {} AND maxplaytime <= {} AND minage >= {}".format(filter_dict['minplayers'], filter_dict['maxplayers'], filter_dict['minplaytime'],filter_dict['maxplaytime'], filter_dict['minage'])
+
+  from sqlalchemy import create_engine
+  engine = create_engine(DATABASE_URL)
+  filtered_games2 = pd.read_sql_query(test_query, engine)
+
+  return filtered_games2
+
 from bokeh.plotting import figure, show, output_file, ColumnDataSource
 from bokeh.embed import components
 
@@ -149,7 +159,7 @@ def recommend():
     filter['minage'] = request.args.get("minage", type=int)
     filter['category'] = request.args.get('category', None, type=str)
     filter['family'] = request.args.get('family', None, type=str)
-    filtered_games = get_filtered_games(filter)
+    filtered_games = get_filtered_games_heroku(filter)
 
     #recommender logic goes here...
     #for the moment, just recommend top games
