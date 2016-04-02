@@ -73,7 +73,7 @@ def get_filtered_games_heroku(filter_dict):
         log.error(ex.message)
 
     try:
-        log.info('stage 1: create engine')
+        log.info('stage 2: create engine')
 
         engine = create_engine(DATABASE_URL)
 
@@ -82,7 +82,7 @@ def get_filtered_games_heroku(filter_dict):
          log.error(ex.message)
 
     try:
-        log.info('stage 1: create engine')
+        log.info('stage 3: other stuff')
         import pandas as pd
         filtered_games2 = pd.read_sql_query(test_query, engine)
     except:
