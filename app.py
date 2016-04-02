@@ -72,12 +72,17 @@ def get_filtered_games(filter_dict):
 def get_filtered_games_heroku(filter_dict):
 
   test_query = "SELECT * FROM games WHERE minplayers <= {} AND maxplayers >= {} AND minplaytime >= {} AND maxplaytime <= {} AND minage >= {}".format(filter_dict['minplayers'], filter_dict['maxplayers'], filter_dict['minplaytime'],filter_dict['maxplaytime'], filter_dict['minage'])
+  print test_query
 
   from sqlalchemy import create_engine
+  print 'hi'
+  DATABASE_URL = 'postgres://xsguljepueowms:IR7-TicHebWDkYr0WGZngcVsa5@ec2-23-21-157-223.compute-1.amazonaws.com:5432/d95o8es4f7241o'
   engine = create_engine(DATABASE_URL)
+  print 'hi2'
   import pandas as pd
+  print 'h3'
   filtered_games2 = pd.read_sql_query(test_query, engine)
-
+  print 'h4'
   return filtered_games2
 
 from bokeh.plotting import figure, show, output_file, ColumnDataSource
