@@ -43,46 +43,22 @@ def get_filtered_games(filter_dict):
 
   filtered_games = pd.read_sql_query(qq, conn)
 
-  # access postgres database
-  DATABASE_URL = 'postgres://xsguljepueowms:IR7-TicHebWDkYr0WGZngcVsa5@ec2-23-21-157-223.compute-1.amazonaws.com:5432/d95o8es4f7241o'
-
-  #import psycopg2
-  #import urlparse
-
-  #urlparse.uses_netloc.append("postgres")
-  #url = urlparse.urlparse(DATABASE_URL)
-
-  ## connect to database
-  #ps_conn = psycopg2.connect(
-  #    database=url.path[1:],
-  #    user=url.username,
-  #    password=url.password,
-  #    host=url.hostname,
-  #    port=url.port
-  #)
-
   test_query = "SELECT * FROM games WHERE minplayers <= {} AND maxplayers >= {} AND minplaytime >= {} AND maxplaytime <= {} AND minage >= {}".format(filter_dict['minplayers'], filter_dict['maxplayers'], filter_dict['minplaytime'],filter_dict['maxplaytime'], filter_dict['minage'])
 
-  from sqlalchemy import create_engine
-  engine = create_engine(DATABASE_URL)
-  filtered_games2 = pd.read_sql_query(test_query, engine)
+  filtered_games = pd.read_sql_query(test_query, conn)
 
-  return filtered_games2
+  return filtered_games
 
 def get_filtered_games_heroku(filter_dict):
 
-  test_query = "SELECT * FROM games WHERE minplayers <= {} AND maxplayers >= {} AND minplaytime >= {} AND maxplaytime <= {} AND minage >= {}".format(filter_dict['minplayers'], filter_dict['maxplayers'], filter_dict['minplaytime'],filter_dict['maxplaytime'], filter_dict['minage'])
-  print test_query
+  test_query = "SELECT * FROM games WHERE name IN ('Agricola','Pandemic')"
 
   from sqlalchemy import create_engine
-  print 'hi'
   DATABASE_URL = 'postgres://xsguljepueowms:IR7-TicHebWDkYr0WGZngcVsa5@ec2-23-21-157-223.compute-1.amazonaws.com:5432/d95o8es4f7241o'
   engine = create_engine(DATABASE_URL)
-  print 'hi2'
+  
   import pandas as pd
-  print 'h3'
   filtered_games2 = pd.read_sql_query(test_query, engine)
-  print 'h4'
   return filtered_games2
 
 from bokeh.plotting import figure, show, output_file, ColumnDataSource
