@@ -1,4 +1,12 @@
 import numpy as np
+import pandas as pd
+
+from bokeh.plotting import figure, show, output_file, ColumnDataSource
+from bokeh.embed import components
+
+import logging
+import sys
+
 from flask import Flask, render_template, request, redirect, jsonify
 
 app = Flask(__name__)
@@ -11,90 +19,41 @@ script2 = '\n<script type="text/javascript">\n    Bokeh.$(function() {\n    var 
 
 div2 = '\n<div class="plotdiv" id="3cf48c60-69f3-43c5-8623-7d6dbb2bd743"></div>'
 
-
 def get_filtered_games(filter_dict):
-    import sqlite3
-    import os
-    import pandas as pd
-    BGG_DB_DIRECTORY = '../bgg_data/sql'
-    games_db_file = os.path.join(BGG_DB_DIRECTORY, 'bgg2.sqlite')
-    conn = sqlite3.connect(games_db_file)
-    # query = "SELECT * FROM games JOIN boardgamecategory ON games.objectid = boardgamecategory.objectid JOIN boardgamefamily ON games.objectid = boardgamefamily.objectid JOIN ranks ON games.objectid = ranks.objectid WHERE rank != 'Not Ranked' AND ranking_name = 'boardgame' AND minplayers >= {} AND maxplayers <= {} AND minplaytime >= {} AND maxplaytime <= {} AND minage >= {}".format(filter_dict['minplayers'], filter_dict['maxplayers'], filter_dict['minplaytime'],filter_dict['maxplaytime'], filter_dict['minage'])
 
-    q1 = "SELECT * FROM games JOIN ranks ON games.objectid = ranks.objectid"
-    q2 = " WHERE rank != 'Not Ranked' AND ranking_name = 'boardgame' AND minplayers <= {} AND maxplayers >= {} AND minplaytime >= {} AND maxplaytime <= {} AND minage >= {}".format(
+    # Defaults to stdout
+    logging.basicConfig(level=logging.INFO)
+    # get the logger for the current Python module
+    log = logging.getLogger(__name__)
+
+    q1 = "SELECT * FROM games"
+    q2 = " WHERE rank <= 2500 AND ranking_name = 'boardgame' AND minplayers <= {} AND maxplayers >= {} AND minplaytime >= {} AND maxplaytime <= {} AND minage >= {}".format(
         filter_dict['minplayers'], filter_dict['maxplayers'], filter_dict['minplaytime'], filter_dict['maxplaytime'],
         filter_dict['minage'])
 
     if filter_dict['category']:
-        # query += ' AND boardgamecategory == "{}"'.format(filter_dict['category'])
         q1 += " JOIN boardgamecategory ON games.objectid = boardgamecategory.objectid"
         q2 += " AND boardgamecategory == '{}'".format(filter_dict['category'])
 
     if filter_dict['family']:
-        # query += ' AND boardgamefamily == "{}"'.format(filter_dict['family'])
         q1 += " JOIN boardgamefamily ON games.objectid = boardgamefamily.objectid"
         q2 += " AND boardgamefamily == '{}'".format(filter_dict['family'])
 
     qq = q1 + q2
 
-    filtered_games = pd.read_sql_query(qq, conn)
-
-    test_query = "SELECT * FROM games WHERE minplayers <= {} AND maxplayers >= {} AND minplaytime >= {} AND maxplaytime <= {} AND minage >= {}".format(
-        filter_dict['minplayers'], filter_dict['maxplayers'], filter_dict['minplaytime'], filter_dict['maxplaytime'],
-        filter_dict['minage'])
-
-    filtered_games = pd.read_sql_query(test_query, conn)
-
-    return filtered_games
-
-
-def get_filtered_games_heroku(filter_dict):
-    print 'hi!'
-
-    import logging
-    import sys
-
-    # Defaults to stdout
-    logging.basicConfig(level=logging.INFO)
-
-    # get the logger for the current Python module
-    log = logging.getLogger(__name__)
-
     try:
-        log.info('stage 1: initial definitions and imports')
-        test_query = "SELECT * FROM games WHERE name IN ('Agricola','Pandemic')"
-
+        log.info('querying database...')
         from sqlalchemy import create_engine
         DATABASE_URL = 'postgres://xsguljepueowms:IR7-TicHebWDkYr0WGZngcVsa5@ec2-23-21-157-223.compute-1.amazonaws.com:5432/d95o8es4f7241o'
-
-    except:
-        _, ex, _ = sys.exc_info()
-        log.error(ex.message)
-
-    try:
-        log.info('stage 2: create engine')
-
         engine = create_engine(DATABASE_URL)
+        filtered_games = pd.read_sql_query(qq, engine)
 
-    except:
-         _, ex, _ = sys.exc_info()
-         log.error(ex.message)
+        return filtered_games
 
-    try:
-        log.info('stage 3: other stuff')
-        import pandas as pd
-        filtered_games2 = pd.read_sql_query(test_query, engine)
     except:
         _, ex, _ = sys.exc_info()
         log.error(ex.message)
-
-    return filtered_games2
-
-
-from bokeh.plotting import figure, show, output_file, ColumnDataSource
-from bokeh.embed import components
-
+        return pd.DataFrame #defaults to empty dataframe
 
 def parse_players(players_df):
     min_players = players_df['minplayers'].astype(str)
@@ -182,11 +141,12 @@ def recommend():
     filter['minage'] = request.args.get("minage", type=int)
     filter['category'] = request.args.get('category', None, type=str)
     filter['family'] = request.args.get('family', None, type=str)
-    filtered_games = get_filtered_games_heroku(filter)
+    filtered_games = get_filtered_games(filter)
 
     # recommender logic goes here...
     # for the moment, just recommend top games
-    rec_games = filtered_games.sort_values(by='rank')[0:10]
+
+    rec_games = filtered_games.sort_values(by='rank', ascending = True)[0:10]
 
     # display results
     if rec_games.empty:
