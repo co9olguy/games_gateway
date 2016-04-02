@@ -75,6 +75,7 @@ def get_filtered_games_heroku(filter_dict):
 
   from sqlalchemy import create_engine
   engine = create_engine(DATABASE_URL)
+  import pandas as pd
   filtered_games2 = pd.read_sql_query(test_query, engine)
 
   return filtered_games2
