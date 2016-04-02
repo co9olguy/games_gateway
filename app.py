@@ -19,58 +19,6 @@ script2 = '\n<script type="text/javascript">\n    Bokeh.$(function() {\n    var 
 
 div2 = '\n<div class="plotdiv" id="3cf48c60-69f3-43c5-8623-7d6dbb2bd743"></div>'
 
-def get_filtered_games(filter_dict):
-
-    # Defaults to stdout
-    logging.basicConfig(level=logging.INFO)
-    # get the logger for the current Python module
-    log = logging.getLogger(__name__)
-
-    q1 = "SELECT * FROM games"
-    q2 = " WHERE rank <= 2500 AND ranking_name = 'boardgame' AND minplayers <= {} AND maxplayers >= {} AND minplaytime >= {} AND maxplaytime <= {} AND minage >= {}".format(
-        filter_dict['minplayers'], filter_dict['maxplayers'], filter_dict['minplaytime'], filter_dict['maxplaytime'],
-        filter_dict['minage'])
-
-    if filter_dict['category']:
-        q1 += " JOIN boardgamecategory ON games.objectid = boardgamecategory.objectid"
-        q2 += " AND boardgamecategory == '{}'".format(filter_dict['category'])
-
-    if filter_dict['family']:
-        q1 += " JOIN boardgamefamily ON games.objectid = boardgamefamily.objectid"
-        q2 += " AND boardgamefamily == '{}'".format(filter_dict['family'])
-
-    qq = q1 + q2
-
-    try:
-        log.info('querying database...')
-        from sqlalchemy import create_engine
-        DATABASE_URL = 'postgres://xsguljepueowms:IR7-TicHebWDkYr0WGZngcVsa5@ec2-23-21-157-223.compute-1.amazonaws.com:5432/d95o8es4f7241o'
-        engine = create_engine(DATABASE_URL)
-        filtered_games = pd.read_sql_query(qq, engine)
-
-        return filtered_games
-
-    except:
-        _, ex, _ = sys.exc_info()
-        log.error(ex.message)
-        return pd.DataFrame #defaults to empty dataframe
-
-def parse_players(players_df):
-    min_players = players_df['minplayers'].astype(str)
-    max_players = players_df['maxplayers'].astype(str)
-    players_str = min_players + "-" + max_players + ' players'
-    return players_str
-
-
-def parse_playtime(players_df, minmax=False):
-    min_playtime = players_df['minplaytime'].astype(str)
-    max_playtime = players_df['maxplaytime'].astype(str)
-    if minmax:
-        playtime_str = min_playtime + "-" + max_playtime + ' minutes'
-    else:
-        playtime_str = max_playtime + ' minutes'
-    return playtime_str
-
 
 def create_recs_page(recs_df, show_page=True):
     # display variables
@@ -114,6 +62,58 @@ def create_recs_page(recs_df, show_page=True):
 
     return script, div
 
+def parse_players(players_df):
+    min_players = players_df['minplayers'].astype(str)
+    max_players = players_df['maxplayers'].astype(str)
+    players_str = min_players + "-" + max_players + ' players'
+    return players_str
+
+
+def parse_playtime(players_df, minmax=False):
+    min_playtime = players_df['minplaytime'].astype(str)
+    max_playtime = players_df['maxplaytime'].astype(str)
+    if minmax:
+        playtime_str = min_playtime + "-" + max_playtime + ' minutes'
+    else:
+        playtime_str = max_playtime + ' minutes'
+    return playtime_str
+
+def get_filtered_games(filter_dict):
+
+    # Defaults to stdout
+    logging.basicConfig(level=logging.INFO)
+    # get the logger for the current Python module
+    log = logging.getLogger(__name__)
+
+    q1 = "SELECT * FROM games" #note: on remote db, ranks table has already been joined and limited to top 2500
+    q2 = " WHERE minplayers <= {} AND maxplayers >= {} AND minplaytime >= {} AND maxplaytime <= {} AND minage >= {}".format(
+        filter_dict['minplayers'], filter_dict['maxplayers'], filter_dict['minplaytime'], filter_dict['maxplaytime'],
+        filter_dict['minage'])
+
+    if filter_dict['category']:
+        q1 += " JOIN boardgamecategory ON games.objectid = boardgamecategory.objectid"
+        q2 += " AND boardgamecategory = '{}'".format(filter_dict['category'])
+
+    if filter_dict['family']:
+        q1 += " JOIN boardgamefamily ON games.objectid = boardgamefamily.objectid"
+        q2 += " AND boardgamefamily = '{}'".format(filter_dict['family'])
+
+    q12 = q1 + q2
+    print q12
+
+    try:
+        log.info('querying database...')
+        from sqlalchemy import create_engine
+        DATABASE_URL = 'postgres://xsguljepueowms:IR7-TicHebWDkYr0WGZngcVsa5@ec2-23-21-157-223.compute-1.amazonaws.com:5432/d95o8es4f7241o'
+        engine = create_engine(DATABASE_URL)
+        filtered_games = pd.read_sql_query(q12, engine)
+
+        return filtered_games
+
+    except:
+        _, ex, _ = sys.exc_info()
+        log.error(ex.message)
+        return pd.DataFrame #defaults to empty dataframe
 
 @app.route('/')
 def main():
@@ -146,7 +146,7 @@ def recommend():
     # recommender logic goes here...
     # for the moment, just recommend top games
 
-    rec_games = filtered_games.sort_values(by='rank', ascending = True)[0:10]
+    rec_games = filtered_games[0:10]
 
     # display results
     if rec_games.empty:
