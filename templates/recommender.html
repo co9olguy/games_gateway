@@ -9,6 +9,8 @@
   <script type=text/javascript>
   $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
   </script>
+  <link rel="stylesheet" href="http://cdn.pydata.org/bokeh/release/bokeh-0.11.0.min.css" type="text/css" />
+  <script type="text/javascript" src="http://cdn.pydata.org/bokeh/release/bokeh-0.11.0.min.js"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='category_autocomplete.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='family_autocomplete.js') }}"></script>
 
@@ -43,7 +45,7 @@
     });
     $( "#time-amount" ).val( $( "#time-range" ).slider( "values", 0 ) +
       " - " + $( "#time-range" ).slider( "values", 1 ) );
-  });  
+  });
 
   //minimum age selector
   $(function() {
@@ -61,6 +63,7 @@
   //submit button
   $(function() {
     $( "#submit-button" ).click(function() {
+      // get data to feed to app
       $.getJSON(
       $SCRIPT_ROOT + '/_recommend',
       { minplayers: $( "#player-range" ).slider( "values", 0 ),
@@ -71,23 +74,24 @@
         category: $( "#categories" ).val(),
         family: $( "#families" ).val()
       },
-      //this is the code to write a returned string to the "result" field
+
+      //display returned data
       function( data ) {
-        // $("#result").text( data.return_string); // for updating page in-place
-        // attempt to open a new page based on returned html
-        // ugly hacky solution, but it works
         if ( data.flag == 0 ){
-          //var x = $( "#categories" ).val()
-          //console.log(x)
           var html = data.result;
-          var uri = "data:text/html," + encodeURIComponent(html);
-          var newWindow = window.open(uri);
+          $( "#recs" ).empty().append(html)
+          //code for opening new window (with no actual domain name, just raw html in browser address bar)
+          //var uri = "data:text/html," + encodeURIComponent(html);
+          //var newWindow = window.open(uri);
         }
+        else {
+          $( "#recs" ).text( data.return_string );
+        };
       });
       return false;
     });
   });
-  
+
   </script>
 </head>
 <body class="ui-widget-content" style="border:0;">
@@ -130,8 +134,7 @@
 <br>
 <br>
 
-<!--<div>Your recommendations: <span id="result"></span></div>-->
+<div id="recs">...</div>
 
- 
 </body>
 </html>
