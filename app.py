@@ -91,12 +91,20 @@ def get_filtered_games(filter_dict):
         filter_dict['minage'])
 
     if filter_dict['category']:
+        #fix postgresql quote issues
+        cat = filter_dict['category']
+        if cat.find("'") != -1:
+            cat = cat.replace("'","''")
+
         q1 += " JOIN boardgamecategory ON games.objectid = boardgamecategory.objectid"
-        q2 += " AND boardgamecategory = '{}'".format(filter_dict['category'])
+        q2 += """ AND boardgamecategory = '{}' """.format(cat)
 
     if filter_dict['family']:
+        fam = filter_dict['family']
+        if fam.find("'") != -1:
+            fam = fam.replace("'","''")
         q1 += " JOIN boardgamefamily ON games.objectid = boardgamefamily.objectid"
-        q2 += " AND boardgamefamily = '{}'".format(filter_dict['family'])
+        q2 += " AND boardgamefamily = '{}'".format(fam)
 
     q12 = q1 + q2
     print q12
