@@ -85,29 +85,60 @@ def get_filtered_games(filter_dict):
     # get the logger for the current Python module
     log = logging.getLogger(__name__)
 
-    q1 = "SELECT * FROM games" #note: on remote db, ranks table has already been joined and limited to top 2500
-    q2 = " WHERE minplayers <= {} AND maxplayers >= {} AND minplaytime >= {} AND maxplaytime <= {} AND minage >= {}".format(
-        filter_dict['minplayers'], filter_dict['maxplayers'], filter_dict['minplaytime'], filter_dict['maxplaytime'],
-        filter_dict['minage'])
+    q1b_list = ["SELECT * FROM games"]
+    q2b_list = []
 
-    if filter_dict['category']:
+    q1 = "SELECT * FROM games " #note: on remote db, ranks table has already been joined and limited to top 2500
+    if 'minplayers' in filter_dict:
+        q2b_list.append("minplayers <= {}".format(filter_dict['minplayers']))
+    if 'maxplayers' in filter_dict:
+        q2b_list.append("maxplayers >= {}".format(filter_dict['maxplayers']))
+    if 'minplaytime' in filter_dict:
+        q2b_list.append("minplaytime <= {}".format(filter_dict['minplaytime']))
+    if 'maxplaytime' in filter_dict:
+        q2b_list.append("maxplaytime <= {}".format(filter_dict['maxplaytime']))
+    if 'minage' in filter_dict:
+        q2b_list.append("minage >= {}".format(filter_dict['minage']))
+
+    #q2 = "WHERE minplayers <= {} AND maxplayers >= {} AND minplaytime >= {} AND maxplaytime <= {} AND minage >= {}".format(
+    #    filter_dict['minplayers'], filter_dict['maxplayers'], filter_dict['minplaytime'], filter_dict['maxplaytime'],
+    #    filter_dict['minage'])
+
+    if 'category' in filter_dict:
         #fix postgresql quote issues
         cat = filter_dict['category']
         if cat.find("'") != -1:
             cat = cat.replace("'","''")
 
-        q1 += " JOIN boardgamecategory ON games.objectid = boardgamecategory.objectid"
-        q2 += """ AND boardgamecategory = '{}' """.format(cat)
+        q1b_list.append("boardgamecategory ON games.objectid = boardgamecategory.objectid")
+        q2b_list.append("""boardgamecategory = '{}'""".format(cat))
 
-    if filter_dict['family']:
+        q1 += " JOIN boardgamecategory ON games.objectid = boardgamecategory.objectid"
+        #q2 += """ AND boardgamecategory = '{}' """.format(cat)
+
+    if 'family' in filter_dict:
         fam = filter_dict['family']
         if fam.find("'") != -1:
             fam = fam.replace("'","''")
-        q1 += " JOIN boardgamefamily ON games.objectid = boardgamefamily.objectid"
-        q2 += " AND boardgamefamily = '{}'".format(fam)
 
-    q12 = q1 + q2
-    print q12
+        q1b_list.append("boardgamefamily ON games.objectid = boardgamefamily.objectid")
+        q2b_list.append("boardgamefamily = '{}'".format(fam))
+
+        q1 += " JOIN boardgamefamily ON games.objectid = boardgamefamily.objectid"
+        #q2 += " AND boardgamefamily = '{}'".format(fam)
+
+    q1b = " JOIN ".join(q1b_list)
+    q2b = " AND ".join(q2b_list)
+    if len(q2b) > 0:
+        qb = q1b + " WHERE " + q2b
+    else:
+        qb = q1b
+
+    print qb
+    q12 = qb
+
+    #q12 = q1 + q2
+    #print q12
 
     try:
         log.info('querying database...')
@@ -142,13 +173,18 @@ def rec_demo():
 def recommend():
     # apply filters based on user selections
     filter = {}
-    filter['minplayers'] = request.args.get('minplayers', type=int)
-    filter['maxplayers'] = request.args.get('maxplayers', type=int)
-    filter['minplaytime'] = request.args.get('minplaytime', type=int)
-    filter['maxplaytime'] = request.args.get('maxplaytime', type=int)
-    filter['minage'] = request.args.get("minage", type=int)
-    filter['category'] = request.args.get('category', None, type=str)
-    filter['family'] = request.args.get('family', None, type=str)
+    if request.args.get('useplayers', type=str) == 'on':
+        filter['minplayers'] = request.args.get('minplayers', type=int)
+        filter['maxplayers'] = request.args.get('maxplayers', type=int)
+    if request.args.get('useplaytime', type=str) == 'on':
+        filter['minplaytime'] = request.args.get('minplaytime', type=int)
+        filter['maxplaytime'] = request.args.get('maxplaytime', type=int)
+    if request.args.get('useage', type=str) == 'on':
+        filter['minage'] = request.args.get("minage", type=int)
+    if request.args.get('usecategory', type=str) == 'on':
+        filter['category'] = request.args.get('category', None, type=str)
+    if request.args.get('usefamily', type=str) == 'on':
+        filter['family'] = request.args.get('family', None, type=str)
     filtered_games = get_filtered_games(filter)
 
     # recommender logic goes here...

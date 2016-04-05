@@ -51,8 +51,8 @@
   $(function() {
     $( "#minage-slider" ).slider({
       min: 0,
-      max: 21,
-      values: [ 0 ],
+      max: 18,
+      values: [ 8 ],
       slide: function( event, ui ) {
         $( "#minage-amount" ).val( ui.values[ 0 ]);
       }
@@ -72,7 +72,12 @@
         maxplaytime: $( "#time-range" ).slider( "values", 1 ),
         minage: $( "#minage-slider" ).slider( "values", 0 ),
         category: $( "#categories" ).val(),
-        family: $( "#families" ).val()
+        family: $( "#families" ).val(),
+        useplayers: $( '#player-check:checked' ).val(),
+        useplaytime: $( '#time-check:checked' ).val(),
+        useage: $( '#age-check:checked' ).val(),
+        usecategory: $( '#category-check:checked' ).val(),
+        usefamily: $( '#family-check:checked' ).val()
       },
 
       //display returned data
@@ -99,18 +104,21 @@
 <div>
  
 <p>
+  <input type="checkbox" id="player-check">
   <label for="player-amount">Number of players:</label>
   <input type="text" id="player-amount" readonly style="border:0; color:#000000; font-weight:bold; width:50px; background-color:transparent;">
 </p>
 <div id="player-range" style="width:200px"></div>
 
 <p>
+  <input type="checkbox" id="time-check">
   <label for="time-amount">Time range (min):</label>
   <input type="text" id="time-amount" readonly style="border:0; color:#000000; font-weight:bold; width:70px; background-color:transparent;">
 </p>
 <div id="time-range" style="width:200px"></div>
 
 <p>
+  <input type="checkbox" id="age-check">
   <label for="minage-amount">Minimum age:</label>
   <input type="text" id="minage-amount" readonly style="border:0; color:#000000; font-weight:bold; width:70px; background-color:transparent;">
 </p>
@@ -119,12 +127,13 @@
 </div>
 
 <br>
-
-<label for="categories">Board game category: </label>
+<input type="checkbox" id="category-check">
+<label for="categories">Board game category: </label><br>
   <input id="categories">
 <br>
 <br>
-<label for="families">Board game family: </label>
+<input type="checkbox" id="family-check">
+<label for="families">Board game family: </label><br>
   <input id="families">
 
 <br>
