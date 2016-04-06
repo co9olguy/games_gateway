@@ -25,7 +25,7 @@ def create_recs_page(recs_df, show_page=True):
     margin = 0.05
     text_margin = 0.1
     size = 1 - 2 * margin
-    N = 6
+    N = max(min(len(recs_df),6),2)
 
     # get data from dataframe
     game_imgs = recs_df['thumbnail'].apply(lambda s: 'http:' + s)
@@ -37,8 +37,8 @@ def create_recs_page(recs_df, show_page=True):
     html_filename = 'recs/recommendations.html'
     output_file(html_filename, title="Your Games Recommendations")
 
-    p = figure(x_range=(0 - margin, 5 + margin), y_range=(0 - margin, N + margin), height=200 * N, width=1000, tools=[],
-               title="Game recommendations")
+    p = figure(x_range=(0 - margin, 5 + margin), y_range=(0 - margin, N + margin), height=200 * N, width=800, tools=[],
+               title="Your game recommendations")
     x_locs = [margin] * N
     y_locs = [N - margin - ctr for ctr in range(0, N)]
 

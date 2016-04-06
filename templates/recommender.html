@@ -2,6 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+
+  <style type="text/css">
+  h1.centered {
+      height: 100px;
+      width: 400px;
+      margin: auto;
+  }
+  </style>
+  <style type="text/css">
+  div.centered {
+      height: 400px;
+      width: 400px;
+      margin: auto;
+  }
+  </style>
+  <style type="text/css">
+  div.centered-wide {
+      height: 800px;
+      width: 800px;
+      margin: auto;
+  }
+  </style>
   <title>Interactive Recommendations demo</title>
   <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
   <script src="//code.jquery.com/jquery-1.10.2.js"></script>
@@ -14,8 +36,17 @@
   <script type="text/javascript" src="{{ url_for('static', filename='category_autocomplete.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='family_autocomplete.js') }}"></script>
 
-  <script>
+  <!-- bootstrap -->
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+  <script>
   //player-range slider
   $(function() {
     $( "#player-range" ).slider({
@@ -99,51 +130,63 @@
 
   </script>
 </head>
-<body class="ui-widget-content" style="border:0;">
+<body class="ui-widget-content" style="border:0">
+<img src="https://c7.staticflickr.com/8/7411/11626122766_d01da719ff_b.jpg" id="bg" alt="" style="position:fixed;top:0;left:0;min-width:100%;min-height:100%;opacity:0.7;z-index:-1;">
 
-<div>
- 
+<div class="centered">
+
+<h1 class="centered">Interactive board<br>game recommender</h1>
+
 <p>
   <input type="checkbox" id="player-check">
-  <label for="player-amount">Number of players:</label>
-  <input type="text" id="player-amount" readonly style="border:0; color:#000000; font-weight:bold; width:50px; background-color:transparent;">
+  <label for="player-amount" style="font-size:14pt">Number of players:</label>
+  <input type="text" id="player-amount" readonly style="border:0; color:#000000; font-weight:bold; width:50px; background-color:transparent; font-size:14pt">
 </p>
-<div id="player-range" style="width:200px"></div>
+<div id="player-range" style="width:400px"></div>
+
+<br>
 
 <p>
   <input type="checkbox" id="time-check">
-  <label for="time-amount">Time range (min):</label>
-  <input type="text" id="time-amount" readonly style="border:0; color:#000000; font-weight:bold; width:70px; background-color:transparent;">
+  <label for="time-amount" style="font-size:14pt">Time range (min):</label>
+  <input type="text" id="time-amount" readonly style="border:0; color:#000000; font-weight:bold; width:70px; background-color:transparent; font-size:14pt">
 </p>
-<div id="time-range" style="width:200px"></div>
+<div id="time-range" style="width:400px"></div>
+
+<br>
 
 <p>
   <input type="checkbox" id="age-check">
-  <label for="minage-amount">Minimum age:</label>
-  <input type="text" id="minage-amount" readonly style="border:0; color:#000000; font-weight:bold; width:70px; background-color:transparent;">
+  <label for="minage-amount" style="font-size:14pt">Minimum age:</label>
+  <input type="text" id="minage-amount" readonly style="border:0; color:#000000; font-weight:bold; width:70px; background-color:transparent; font-size:14pt">
 </p>
-<div id="minage-slider" style="width:200px"></div>
-
-</div>
+<div id="minage-slider" style="width:400px"></div>
 
 <br>
 <input type="checkbox" id="category-check">
-<label for="categories">Board game category: </label><br>
-  <input id="categories">
+<label for="categories" style="font-size:14pt">Board game category: </label><br>
+  <input id="categories"  style="width:400px">
 <br>
 <br>
 <input type="checkbox" id="family-check">
-<label for="families">Board game family: </label><br>
-  <input id="families">
-
-<br>
-<br>
-<button id="submit-button">Submit</button>
+<label for="families" style="font-size:14pt">Board game family: </label><br>
+  <input id="families" style="width:400px">
 
 <br>
 <br>
 
-<div id="recs">...</div>
+<div class="centered"><button id="submit-button" style="font-size:14pt">Submit</button></div>
+
+</div>
+<br>
+<br>
+<br>
+<br>
+
+<br>
+<br>
+
+<div class="centered-wide", id="recs"></div>
 
 </body>
 </html>

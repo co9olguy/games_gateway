@@ -11,13 +11,37 @@
 <script type="text/javascript">
     Bokeh.set_log_level("info");
 </script>
+  <style type="text/css">
+  div.centered {
+      height: 400px;
+      width: 950px;
+      margin: auto;
+  }
+  </style>
+  <style type="text/css">
+  h1.centered {
+      height: 100px;
+      width: 400px;
+      margin: auto;
+  }
+  </style>
+        <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
     </head>
     <body>
-        
+    <img src="https://c7.staticflickr.com/8/7411/11626122766_d01da719ff_b.jpg" id="bg" alt="" style="position:fixed;top:0;left:0;min-width:100%;min-height:100%;opacity:0.7;z-index:-1;">
+
         <div>
      <!--   <h1>Wargames Fan</h1>
 	Your supplied ratings:-->
-            <h1>Your supplied ratings:</h1>
+            <h1 class="centered">Your supplied ratings:</h1>
        <!-- <ul>
 
         	<li><strong>Hannibal: Rome vs. Carthage: 10/10</strong></li>
@@ -31,29 +55,29 @@
         </ul>
         -->
 
-         <table style="width:100%">
+         <table style="width:80%;margin:auto;">
           <tr>
             <td style="text-align:center">
                 <img src="http://cf.geekdo-images.com/images/pic2872065_t.jpg">
                 <br>
-                <strong>Hannibal: Rome vs. Carthage: 10/10</strong>
+                <strong style="font-size:14pt">Hannibal: Rome vs. Carthage: 10/10</strong>
             </td>
             <td style="text-align:center">
                 <img src="http://cf.geekdo-images.com/images/pic771969_t.jpg">
                 <br>
-                <strong>Advanced Squad Leader: 10/10</strong>
+                <strong style="font-size:14pt">Advanced Squad Leader: 10/10</strong>
             </td>
           </tr>
           <tr>
             <td style="text-align:center">
                 <img src="http://cf.geekdo-images.com/images/pic834645_t.jpg">
                 <br>
-                <strong>Paths of Glory: 10/10</strong>
+                <strong style="font-size:14pt">Paths of Glory: 10/10</strong>
             </td>
              <td style="text-align:center">
                 <img src="http://cf.geekdo-images.com/images/pic162086_t.jpg">
                 <br>
-                <strong>Up Front: 10/10</strong>
+                <strong style="font-size:14pt">Up Front: 10/10</strong>
             </td>
           </tr>
         </table>
@@ -63,7 +87,7 @@
         </div>
         <br>
         
-        <div class="plotdiv" id="7719e059-fddb-43e7-8bc0-003b94bd22cb"></div>
+<div class="centered">        <div class="plotdiv" id="7719e059-fddb-43e7-8bc0-003b94bd22cb"></div></div>
         
         <script type="text/javascript">
             Bokeh.$(function() {
