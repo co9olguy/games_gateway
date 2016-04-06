@@ -94,7 +94,7 @@ def get_filtered_games(filter_dict):
     if 'maxplayers' in filter_dict:
         q2b_list.append("maxplayers >= {}".format(filter_dict['maxplayers']))
     if 'minplaytime' in filter_dict:
-        q2b_list.append("minplaytime <= {}".format(filter_dict['minplaytime']))
+        q2b_list.append("minplaytime >= {}".format(filter_dict['minplaytime']))
     if 'maxplaytime' in filter_dict:
         q2b_list.append("maxplaytime <= {}".format(filter_dict['maxplaytime']))
     if 'minage' in filter_dict:
