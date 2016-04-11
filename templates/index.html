@@ -1,51 +1,117 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="assets/ico/favicon.ico">
 
-		<title>Games Gateway</title>
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <title>Games Gateway - Discover new board games</title>
 
-		<!-- bootstrap -->
-		<!-- Latest compiled and minified CSS -->
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for('static', filename="css/bootstrap.css") }}" rel="stylesheet">
 
-		<!-- Optional theme -->
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+    <!-- Custom styles for this template -->
+    <link href="{{ url_for('static', filename="css/style.css") }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename="css/font-awesome.min.css") }}" rel="stylesheet">
 
-		<!-- Latest compiled and minified JavaScript -->
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
 
-	</head>
-	<body>
-	    <img src="https://c7.staticflickr.com/8/7411/11626122766_d01da719ff_b.jpg" id="bg" alt="" style="position:fixed;top:0;left:0;min-width:100%;min-height:100%;opacity:0.7;z-index:-1;">
-		<div align="center">
-  			<h1>Welcome to Games Gateway</h1>
+  <body>
 
-  			<h2>Game ratings data</h2>
-  			<a href="game_ratings" style="color:blue;font-size:14pt">Game ratings plot</a><br>
-  			
-  			<h2>Recommender system demo</h2>
-  			<a href="recommender_dev" style="color:blue;font-size:14pt">Interactive Recommender Test</a><br>
-  			<a href="rec_demo3" style="color:blue;font-size:14pt">War Gamer</a><br>
+    <!-- Static navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="index.html">GAMES GATEWAY</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <!--<li class="active"><a href="index.html">Home</a></li>-->
+            <li><a href="/discover">Explore</a></li>
+            <li><a href="/discover">Recommend</a></li>
+            <li><a href="about.html">About</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
 
-  			<h2>Older demos</h2>
 
+	<div id="headerwrap">
+	    <div class="container">
+			<div class="row">
+				<div class="col-lg-6 col-lg-offset-3">
+					<h1>Games Gateway</h1>
+					<h4>Discover new games</h4>
+				</div>
+			</div><! --/row -->
+	    </div> <!-- /container -->
+	</div><! --/headerwrap -->
 
-  			<a href="figure1" style="color:blue;font-size:14pt">Board game clustering by play mechanics</a><br>
-  			<a href="figure2" style="color:blue;font-size:14pt">Sample recmmendation</a><br>
+	
+	<section id="works"></section>
+	<div class="container">
+		<div class="row centered mt mb">
+			<h1>My Portfolio</h1>
+			
+			<div class="col-lg-4 col-md-4 col-sm-4 gallery">
+				<a href="work.html"><img src="{{ url_for('static', filename='img/portfolio/folio01.png') }}" class="img-responsive"></a>
+			</div>
+			<div class="col-lg-4 col-md-4 col-sm-4 gallery">
+				<a href="work.html"><img src="{{ url_for('static', filename='img/portfolio/folio02.png') }}" class="img-responsive"></a>
+			</div>
+			<div class="col-lg-4 col-md-4 col-sm-4 gallery">
+				<a href="work.html"><img src="{{ url_for('static', filename='img/portfolio/folio03.png') }}" class="img-responsive"></a>
+			</div>
+			<div class="col-lg-4 col-md-4 col-sm-4 gallery">
+				<a href="work.html"><img src="{{ url_for('static', filename='img/portfolio/folio04.png') }}" class="img-responsive"></a>
+			</div>
+			<div class="col-lg-4 col-md-4 col-sm-4 gallery">
+				<a href="work.html"><img src="{{ url_for('static', filename='img/portfolio/folio05.png') }}" class="img-responsive"></a>
+			</div>
+			<div class="col-lg-4 col-md-4 col-sm-4 gallery">
+				<a href="work.html"><img src="{{ url_for('static', filename='img/portfolio/folio06.png') }}" class="img-responsive"></a>
+			</div>
+		</div><! --/row -->
+	</div><! --/container -->
+	
 
-  			<a href="rec_demo1" style="color:blue;font-size:14pt">Core Eurogamer</a><br>
-<!--  			<a href="rec_demo2 style="color:blue"">Demo: Complex Eurogamer</a><br> -->
-  			<a href="rec_demo4" style="color:blue;font-size:14pt">Kickstarter games</a><br>
-  			<a href="rec_demo5" style="color:blue;font-size:14pt">Games with Dinosaurs</a><br>
-  			<a href="rec_demo6" style="color:blue;font-size:14pt">Games with Sherlock Holmes</a><br>
-  			<a href="rec_demo2" style="color:blue;font-size:14pt">Star Wars Trivia Games</a><br>
-  			<a href="rec_demo7" style="color:blue;font-size:14pt">Joke Game Fan</a><br>
-
-  			  			
+	<div id="footerwrap">
+		<div class="container">
+			<div class="row centered">
+				<div class="col-lg-4">
+					<p><b>Built by Nathan Killoran</b></p>
+				</div>
+			
+				<div class="col-lg-4">
+					<p>Fellow at the Data Incubator</p>
+				</div>
+				<div class="col-lg-4">
+					<p>nkilloran@gmail.com</p>
+				</div>
+			</div>
 		</div>
-	</body>
+	</div><! --/footerwrap -->
+	
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  </body>
 </html>
