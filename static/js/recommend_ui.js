@@ -1,0 +1,80 @@
+  //player-range slider
+  $(function() {
+    $( "#player-range" ).slider({
+      range: true,
+      min: 1,
+      max: 15,
+      values: [ 2, 4 ],
+      slide: function( event, ui ) {
+        $( "#player-amount" ).val( ui.values[ 0 ] + " - " + ui.values[ 1 ] );
+      }
+    });
+    $( "#player-amount" ).val( $( "#player-range" ).slider( "values", 0 ) +
+      " - " + $( "#player-range" ).slider( "values", 1 ) );
+  });
+
+  //time-range selector
+  $(function() {
+    $( "#time-range" ).slider({
+      range: true,
+      min: 0,
+      max: 600,
+      values: [ 30, 600 ],
+      step: 15,
+      slide: function( event, ui ) {
+        $( "#time-amount" ).val( ui.values[ 0 ] + " - " + ui.values[ 1 ] );
+      }
+    });
+    $( "#time-amount" ).val( $( "#time-range" ).slider( "values", 0 ) +
+      " - " + $( "#time-range" ).slider( "values", 1 ) );
+  });
+
+  //minimum age selector
+  $(function() {
+    $( "#minage-slider" ).slider({
+      min: 0,
+      max: 18,
+      values: [ 8 ],
+      slide: function( event, ui ) {
+        $( "#minage-amount" ).val( ui.values[ 0 ]);
+      }
+    });
+    $( "#minage-amount" ).val( $( "#minage-slider" ).slider( "values", 0 ) );
+  });
+
+  //submit button
+  $(function() {
+    $( "#submit-button" ).click(function() {
+      // get data to feed to app
+      $.getJSON(
+      $SCRIPT_ROOT + '/_recommend',
+      { minplayers: $( "#player-range" ).slider( "values", 0 ),
+        maxplayers: $( "#player-range" ).slider( "values", 1 ),
+        minplaytime: $( "#time-range" ).slider( "values", 0 ),
+        maxplaytime: $( "#time-range" ).slider( "values", 1 ),
+        minage: $( "#minage-slider" ).slider( "values", 0 ),
+        category: $( "#categories" ).val(),
+        family: $( "#families" ).val(),
+        useplayers: $( '#player-check:checked' ).val(),
+        useplaytime: $( '#time-check:checked' ).val(),
+        useage: $( '#age-check:checked' ).val(),
+        usecategory: $( '#category-check:checked' ).val(),
+        usefamily: $( '#family-check:checked' ).val()
+      },
+
+      //display returned data
+      function( data ) {
+        if ( data.flag == 0 ){
+          var html = data.result;
+          $( "#recs" ).empty().append(html)
+          //code for opening new window (with no actual domain name, just raw html in browser address bar)
+          //var uri = "data:text/html," + encodeURIComponent(html);
+          //var newWindow = window.open(uri);
+        }
+        else {
+          $( "#recs" ).text( data.return_string );
+        };
+      });
+      return false;
+    });
+  });

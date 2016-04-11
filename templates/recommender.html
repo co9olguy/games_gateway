@@ -1,193 +1,173 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-
-  <style type="text/css">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="assets/ico/favicon.ico">
+    <style type="text/css">
   h1.centered {
       height: 100px;
       width: 400px;
       margin: auto;
   }
   </style>
-  <style type="text/css">
+    <style type="text/css">
   div.centered {
       height: 400px;
       width: 400px;
       margin: auto;
   }
   </style>
-  <style type="text/css">
+    <style type="text/css">
   div.centered-wide {
       height: 800px;
       width: 800px;
       margin: auto;
   }
   </style>
-  <title>Interactive Recommendations demo</title>
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-  <script type=text/javascript>
-  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-  </script>
-  <link rel="stylesheet" href="http://cdn.pydata.org/bokeh/release/bokeh-0.11.0.min.css" type="text/css" />
-  <script type="text/javascript" src="http://cdn.pydata.org/bokeh/release/bokeh-0.11.0.min.js"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='category_autocomplete.js') }}"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename='family_autocomplete.js') }}"></script>
 
-  <!-- bootstrap -->
-<!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <title>Games Gateway - Game Explorer</title>
 
-<!-- Optional theme -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+      <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+      <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+      <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+      <script type=text/javascript>
+      $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+      </script>
 
-<!-- Latest compiled and minified JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+      <script type="text/javascript" src="{{ url_for('static', filename='js/recommend_ui.js') }}"></script>
+      <script type="text/javascript" src="{{ url_for('static', filename='js/category_autocomplete.js') }}"></script>
+      <script type="text/javascript" src="{{ url_for('static', filename='js/family_autocomplete.js') }}"></script>
 
-  <script>
-  //player-range slider
-  $(function() {
-    $( "#player-range" ).slider({
-      range: true,
-      min: 1,
-      max: 15,
-      values: [ 2, 4 ],
-      slide: function( event, ui ) {
-        $( "#player-amount" ).val( ui.values[ 0 ] + " - " + ui.values[ 1 ] );
-      }
-    });
-    $( "#player-amount" ).val( $( "#player-range" ).slider( "values", 0 ) +
-      " - " + $( "#player-range" ).slider( "values", 1 ) );
-  });
+        <!-- Bootstrap core CSS -->
+        <link href="{{ url_for('static', filename="css/bootstrap.css") }}" rel="stylesheet">
+        <!-- Custom styles for this template -->
+        <link href="{{ url_for('static', filename="css/style.css") }}" rel="stylesheet">
+        <link href="{{ url_for('static', filename="css/font-awesome.min.css") }}" rel="stylesheet">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+          <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
 
-  //time-range selector
-  $(function() {
-    $( "#time-range" ).slider({
-      range: true,
-      min: 0,
-      max: 600,
-      values: [ 30, 600 ],
-      step: 15,
-      slide: function( event, ui ) {
-        $( "#time-amount" ).val( ui.values[ 0 ] + " - " + ui.values[ 1 ] );
-      }
-    });
-    $( "#time-amount" ).val( $( "#time-range" ).slider( "values", 0 ) +
-      " - " + $( "#time-range" ).slider( "values", 1 ) );
-  });
-
-  //minimum age selector
-  $(function() {
-    $( "#minage-slider" ).slider({
-      min: 0,
-      max: 18,
-      values: [ 8 ],
-      slide: function( event, ui ) {
-        $( "#minage-amount" ).val( ui.values[ 0 ]);
-      }
-    });
-    $( "#minage-amount" ).val( $( "#minage-slider" ).slider( "values", 0 ) );
-  });
-
-  //submit button
-  $(function() {
-    $( "#submit-button" ).click(function() {
-      // get data to feed to app
-      $.getJSON(
-      $SCRIPT_ROOT + '/_recommend',
-      { minplayers: $( "#player-range" ).slider( "values", 0 ),
-        maxplayers: $( "#player-range" ).slider( "values", 1 ),
-        minplaytime: $( "#time-range" ).slider( "values", 0 ),
-        maxplaytime: $( "#time-range" ).slider( "values", 1 ),
-        minage: $( "#minage-slider" ).slider( "values", 0 ),
-        category: $( "#categories" ).val(),
-        family: $( "#families" ).val(),
-        useplayers: $( '#player-check:checked' ).val(),
-        useplaytime: $( '#time-check:checked' ).val(),
-        useage: $( '#age-check:checked' ).val(),
-        usecategory: $( '#category-check:checked' ).val(),
-        usefamily: $( '#family-check:checked' ).val()
-      },
-
-      //display returned data
-      function( data ) {
-        if ( data.flag == 0 ){
-          var html = data.result;
-          $( "#recs" ).empty().append(html)
-          //code for opening new window (with no actual domain name, just raw html in browser address bar)
-          //var uri = "data:text/html," + encodeURIComponent(html);
-          //var newWindow = window.open(uri);
-        }
-        else {
-          $( "#recs" ).text( data.return_string );
-        };
-      });
-      return false;
-    });
-  });
-
-  </script>
-</head>
-<body class="ui-widget-content" style="border:0">
-<img src="{{ url_for('static', filename='carc.jpg') }}" id="bg" alt="" style="position:fixed;top:0;left:0;min-width:100%;min-height:100%;opacity:0.7;z-index:-1;">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
 
-<div class="centered">
+        <script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-0.11.0.min.js"></script>
+        <script type="text/javascript">
+            Bokeh.set_log_level("info");
+        </script>
 
-<h1 class="centered">Interactive board<br>game recommender</h1>
 
-<p>
-  <input type="checkbox" id="player-check">
-  <label for="player-amount" style="font-size:14pt">Number of players:</label>
-  <input type="text" id="player-amount" readonly style="border:0; color:#000000; font-weight:bold; width:50px; background-color:transparent; font-size:14pt">
-</p>
-<div id="player-range" style="width:400px"></div>
+  </head>
 
-<br>
+  <body>
 
-<p>
-  <input type="checkbox" id="time-check">
-  <label for="time-amount" style="font-size:14pt">Time range (min):</label>
-  <input type="text" id="time-amount" readonly style="border:0; color:#000000; font-weight:bold; width:70px; background-color:transparent; font-size:14pt">
-</p>
-<div id="time-range" style="width:400px"></div>
+    <!-- Static navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="index">GAMES GATEWAY</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <!--<li class="active"><a href="index.html">Home</a></li>-->
+            <li><a href="/explore">Explore</a></li>
+            <li><a href="/recommend">Recommend</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
 
-<br>
 
-<p>
-  <input type="checkbox" id="age-check">
-  <label for="minage-amount" style="font-size:14pt">Minimum age:</label>
-  <input type="text" id="minage-amount" readonly style="border:0; color:#000000; font-weight:bold; width:70px; background-color:transparent; font-size:14pt">
-</p>
-<div id="minage-slider" style="width:400px"></div>
+		<div class="row centered mt mb" style="padding-top:75px; padding-bottom:75px;height:200px">
+			<h1>Game Recommender</h1>
+            <h4>What kind of game are you looking for?</h4>
+		</div><! --/row -->
 
-<br>
-<input type="checkbox" id="category-check">
-<label for="categories" style="font-size:14pt">Board game category: </label><br>
-  <input id="categories"  style="width:400px">
-<br>
-<br>
-<input type="checkbox" id="family-check">
-<label for="families" style="font-size:14pt">Board game family: </label><br>
-  <input id="families" style="width:400px">
 
-<br>
-<br>
+    <div class="container">
+        <div class="row centered mt mb">
+          <input type="checkbox" id="player-check">
+          <label for="player-amount" style="font-size:14pt">Number of players:</label>
+          <input type="text" id="player-amount" readonly style="border:0; color:#000000; font-weight:bold; width:50px; background-color:transparent; font-size:14pt">
+            </p>
+            <div id="player-range" style="width:400px"></div>
+            <br>
+            <p>
+              <input type="checkbox" id="time-check">
+              <label for="time-amount" style="font-size:14pt">Time range (min):</label>
+              <input type="text" id="time-amount" readonly style="border:0; color:#000000; font-weight:bold; width:70px; background-color:transparent; font-size:14pt">
+            </p>
+            <div id="time-range" style="width:400px"></div>
 
-<div class="centered"><button id="submit-button" style="font-size:14pt">Submit</button></div>
+            <br>
+
+            <p>
+              <input type="checkbox" id="age-check">
+              <label for="minage-amount" style="font-size:14pt">Minimum age:</label>
+              <input type="text" id="minage-amount" readonly style="border:0; color:#000000; font-weight:bold; width:70px; background-color:transparent; font-size:14pt">
+            </p>
+            <div id="minage-slider" style="width:400px"></div>
+
+            <br>
+            <input type="checkbox" id="category-check">
+            <label for="categories" style="font-size:14pt">Board game category: </label>
+            <br>
+              <input id="categories"  style="width:400px">
+            <br>
+            <br>
+
+            <input type="checkbox" id="family-check">
+            <label for="families" style="font-size:14pt">Board game family: </label><br>
+              <input id="families" style="width:400px">
+
+            <br>
+            <br>
+
+            <button id="submit-button" style="font-size:14pt">Submit</button>
+
+		</div><! --/row -->
+	</div><! --/container -->
+
+
+
+<div class="centered-wide" id="recs" style="padding-top:25px"></div>
+
+<!-- take out footer until I can get it right
+
+	<div id="footerwrap">
+		<div class="container">
+			<div class="row centered">
+				<div class="col-lg-4">
+					<p><b>Built by Nathan Killoran</b></p>
+				</div>
+
+				<div class="col-lg-4">
+					<p>Fellow at the Data Incubator</p>
+				</div>
+				<div class="col-lg-4">
+					<p>nkilloran@gmail.com</p>
+				</div>
+			</div>
+		</div>
+	</div><! --/footerwrap -->
 
 </div>
-<br>
-<br>
-<br>
-<br>
 
-<br>
-<br>
 
-<div class="centered-wide", id="recs"></div>
-
-</body>
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  </body>
 </html>

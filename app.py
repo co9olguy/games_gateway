@@ -164,7 +164,7 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/recommender_dev')
+@app.route('/recommend')
 def rec_demo():
     return render_template('recommender.html')
 
@@ -216,7 +216,7 @@ def figure2():
     return render_template('figure2b.html')
 
 
-@app.route('/game_ratings')
+@app.route('/explore')
 def game_ratings():
     return render_template('game_ratings.html')
 
