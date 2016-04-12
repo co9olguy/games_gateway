@@ -98,15 +98,15 @@
     <div class="container">
         <div class="row centered mt mb">
           <input type="checkbox" id="player-check">
-          <label for="player-amount" style="font-size:14pt">Number of players:</label>
-          <input type="text" id="player-amount" readonly style="border:0; color:#000000; font-weight:bold; width:50px; background-color:transparent; font-size:14pt">
+          <label for="player-check" style="font-size:14pt">Number of players:</label>
+          <input type="text" id="player-amount" readonly style="border:0; color:#000000; font-weight:bold; width:75px; background-color:transparent; font-size:14pt">
             </p>
             <div id="player-range" style="width:400px"></div>
             <br>
             <p>
               <input type="checkbox" id="time-check">
-              <label for="time-amount" style="font-size:14pt">Time range (min):</label>
-              <input type="text" id="time-amount" readonly style="border:0; color:#000000; font-weight:bold; width:70px; background-color:transparent; font-size:14pt">
+              <label for="time-check" style="font-size:14pt">Time range (min):</label>
+              <input type="text" id="time-amount" readonly style="border:0; color:#000000; font-weight:bold; width:100px; background-color:transparent; font-size:14pt">
             </p>
             <div id="time-range" style="width:400px"></div>
 
@@ -114,21 +114,21 @@
 
             <p>
               <input type="checkbox" id="age-check">
-              <label for="minage-amount" style="font-size:14pt">Minimum age:</label>
+              <label for="age-check" style="font-size:14pt">Minimum age:</label>
               <input type="text" id="minage-amount" readonly style="border:0; color:#000000; font-weight:bold; width:70px; background-color:transparent; font-size:14pt">
             </p>
             <div id="minage-slider" style="width:400px"></div>
 
             <br>
             <input type="checkbox" id="category-check">
-            <label for="categories" style="font-size:14pt">Board game category: </label>
+            <label for="category-check" style="font-size:14pt">Board game category: </label>
             <br>
               <input id="categories"  style="width:400px">
             <br>
             <br>
 
             <input type="checkbox" id="family-check">
-            <label for="families" style="font-size:14pt">Board game family: </label><br>
+            <label for="family-check" style="font-size:14pt">Board game family: </label><br>
               <input id="families" style="width:400px">
 
             <br>
@@ -140,8 +140,35 @@
 	</div><! --/container -->
 
 
+	<div class="container" id="recs-container" style="width:90%;padding-top:50px;margin-bottom:50px">
+		<div class="row centered mt mb" style="width:90%;margin-top:50px">
+			<h1>Your Recommendations</h1>
+            <h4 id="msg_appear"></h4>
 
-<div class="centered-wide" id="recs" style="padding-top:25px"></div>
+			<div class="col-lg-4 col-md-4 col-sm-4 gallery" id="rec1" style="50%">
+                <img src="{{ url_for('static', filename='img/mystery_box.png') }}" class="img-responsive">
+			</div>
+            <div class="col-lg-4 col-md-4 col-sm-4 gallery" id="rec2" style="50%">
+				<img src="{{ url_for('static', filename='img/mystery_box.png') }}" class="img-responsive">
+			</div>
+			<div class="col-lg-4 col-md-4 col-sm-4 gallery" id="rec3" style="50%">
+				<img src="{{ url_for('static', filename='img/mystery_box.png') }}" class="img-responsive">
+			</div>
+			<div class="col-lg-4 col-md-4 col-sm-4 gallery" id="rec4" style="50%">
+				<img src="{{ url_for('static', filename='img/mystery_box.png') }}" class="img-responsive">
+			</div>
+			<div class="col-lg-4 col-md-4 col-sm-4 gallery" id="rec5" style="50%">
+				<img src="{{ url_for('static', filename='img/mystery_box.png') }}" class="img-responsive">
+			</div>
+			<div class="col-lg-4 col-md-4 col-sm-4 gallery" id="rec6" style="50%">
+				<img src="{{ url_for('static', filename='img/mystery_box.png') }}" class="img-responsive">
+			</div>
+		</div><! --/row -->
+	</div><! --/container -->
+
+
+<!--<div class="centered-wide" id="recs" style="padding-top:25px"></div>
+
 
 <!-- take out footer until I can get it right
 
@@ -161,8 +188,6 @@
 			</div>
 		</div>
 	</div><! --/footerwrap -->
-
-</div>
 
 
     <!-- Bootstrap core JavaScript

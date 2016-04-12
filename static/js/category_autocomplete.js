@@ -86,6 +86,11 @@ $(function() {
                 'Game System',
                 'Fan Expansion'];
                 $( "#categories" ).autocomplete({
-                source: availableCategories
+                source: availableCategories,
+                maxLength:25,
+                select: function( event, ui ) {
+                            $( "#category-check").prop("checked", true);
+                            return true
+                        }
         });
 });

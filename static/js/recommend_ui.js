@@ -7,6 +7,10 @@
       values: [ 2, 4 ],
       slide: function( event, ui ) {
         $( "#player-amount" ).val( ui.values[ 0 ] + " - " + ui.values[ 1 ] );
+      },
+      stop: function( event, ui ) {
+            $( "#player-check").prop("checked", true);
+            return true
       }
     });
     $( "#player-amount" ).val( $( "#player-range" ).slider( "values", 0 ) +
@@ -19,10 +23,13 @@
       range: true,
       min: 0,
       max: 600,
-      values: [ 30, 600 ],
+      values: [ 30, 120 ],
       step: 15,
+      stop: function( event, ui ) {
+                                    $( "#time-check").prop("checked", true);
+                                    return true},
       slide: function( event, ui ) {
-        $( "#time-amount" ).val( ui.values[ 0 ] + " - " + ui.values[ 1 ] );
+        $( "#time-amount" ).val( ui.values[ 0 ] + " - " + ui.values[ 1 ] )
       }
     });
     $( "#time-amount" ).val( $( "#time-range" ).slider( "values", 0 ) +
@@ -36,7 +43,11 @@
       max: 18,
       values: [ 8 ],
       slide: function( event, ui ) {
-        $( "#minage-amount" ).val( ui.values[ 0 ]);
+        $( "#minage-amount" ).val( ui.values[ 0 ])
+      },
+      stop: function( event, ui ) {
+            $( "#age-check").prop("checked", true);
+            return true
       }
     });
     $( "#minage-amount" ).val( $( "#minage-slider" ).slider( "values", 0 ) );
@@ -65,14 +76,11 @@
       //display returned data
       function( data ) {
         if ( data.flag == 0 ){
-          var html = data.result;
-          $( "#recs" ).empty().append(html)
-          //code for opening new window (with no actual domain name, just raw html in browser address bar)
-          //var uri = "data:text/html," + encodeURIComponent(html);
-          //var newWindow = window.open(uri);
+          var recs_html = data.recs_html;
+          $( "#recs-container" ).empty().append(recs_html);
         }
         else {
-          $( "#recs" ).text( data.return_string );
+          $( "#recs-container" ).empty().text( data.return_string );
         };
       });
       return false;

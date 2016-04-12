@@ -23,8 +23,8 @@ $(function() {
             "Abalone",
             "Ace of Aces",
             "Ace of Aces WWI Family",
-            "Admin: Better Description Needed!",
-            "Admin: Unreleased Games",
+            //"Admin: Better Description Needed!",
+            //"Admin: Unreleased Games",
             "Advanced Squad Leader",
             "Advanced Squad Leader Starter Kit",
             "Age of Discovery",
@@ -789,6 +789,12 @@ $(function() {
             "n in a row"
          ];
         $( "#families" ).autocomplete({
-            source: availableFamilies
+                source: availableFamilies,
+                maxLength:50,
+                select: function( event, ui ) {
+                            $( "#family-check").prop("checked", true);
+                            return true
+                        }
+
         });
 });
