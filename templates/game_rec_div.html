@@ -1,0 +1,28 @@
+<html>
+  <head></head>
+  <body>
+  	<div class="container">
+		<div class="row centered mt mb" style="width:90%;padding-top:50px;margin-bottom:50px">
+			<h1>Your Recommendations</h1>
+            <h4 id="msg_appear">Click on a game to view it on Boardgamegeek.com</h4>
+
+                {% for row in recs_dict['data'] %}
+                    <div class="col-lg-4 col-md-4 col-sm-4 gallery" style="padding-bottom:50px;">
+                        <div style="height=75px;">
+                            <a target="_blank" href="{{ row[0] }}"><img src="{{ row[1] }}" class="img-responsive" style="display:block;margin-left:auto;margin-right:auto;margin-bottom:10px;">
+                                <div style = "height:60px">
+                                    <h3>{{ row[2] }}</h3>
+                                </div>
+                            </a>
+                            <p>
+                                {{ row[3] }}-{{ row[4] }} players<br>
+                                Playtime {{ row[5] }}-{{ row[6] }} minutes
+                            </p>
+                        </div>
+                    </div>
+                {% endfor %}
+
+	</div><! --/container -->
+
+  </body>
+</html>
