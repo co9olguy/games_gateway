@@ -1,8 +1,8 @@
-DEMO = False
+use_gl = True
 
 import numpy as np
 import pandas as pd
-rated_games = pd.DataFrame( columns = ['objectid','name','thumbnail','rating'])
+from sqlalchemy import create_engine
 
 if DEMO:
     import graphlab as gl
@@ -126,7 +126,6 @@ def get_filtered_games(filter_dict):
 
     try:
         log.info('querying database...')
-        from sqlalchemy import create_engine
         DATABASE_URL = 'postgres://xsguljepueowms:IR7-TicHebWDkYr0WGZngcVsa5@ec2-23-21-157-223.compute-1.amazonaws.com:5432/d95o8es4f7241o'
         engine = create_engine(DATABASE_URL)
         filtered_games = pd.read_sql_query(qb, engine)
@@ -138,58 +137,52 @@ def get_filtered_games(filter_dict):
         log.error(ex.message)
         return pd.DataFrame #defaults to empty dataframe
 
-@app.route('/')
-def main():
-    return redirect('/index')
-
-
-@app.route('/index')
-def index():
-    return render_template('index.html')
-
-
-@app.route('/recommend')
-def rec():
-    global session_game_cntr
-    session_game_cntr = 0
-    return render_template('recommender.html')
-
 @app.route('/_fetch_ratings_game')
 def fetch_ratings_game():
 
-    global session_game_cntr
+    global rated_games
 
     logging.basicConfig(level=logging.INFO)
     # get the logger for the current Python module
     log = logging.getLogger(__name__)
 
-    game_name = request.args.get('name', type = str)
-    query = r"SELECT objectid as objectid, name as name, thumbnail as thumbnail FROM games WHERE name = '" + game_name + r"'"
-    print game_name
-    print query
-    try:
-        log.info('querying database...')
-        from sqlalchemy import create_engine
-        DATABASE_URL = 'postgres://xsguljepueowms:IR7-TicHebWDkYr0WGZngcVsa5@ec2-23-21-157-223.compute-1.amazonaws.com:5432/d95o8es4f7241o'
-        engine = create_engine(DATABASE_URL)
-        selected_game = pd.read_sql_query(query, engine)
-        selected_game['rating'] = np.nan
-#        rated_games.append(selected_game, inplace=True)
-    except:
-        _, ex, _ = sys.exc_info()
-        log.error(ex.message)
-        return pd.DataFrame  # defaults to empty dataframe
+    game_name = request.args.get('name', '', type = unicode)
+    print rated_games['name'].values
+    if game_name in rated_games['name'].values:
+        return jsonify(flag = 1)
+    else:
 
-    session_game_cntr += 1
-    recs_html = render_template('game_rating_div.html',
-                                session_game_number = session_game_cntr,
-                                name = selected_game['name'].iloc[0],
-                                img = 'http:'+selected_game['thumbnail'].iloc[0],
-                                objectid = selected_game['objectid'].iloc[0])
-    return jsonify(recs_html = recs_html, flag=0 )
+        query = r"SELECT objectid as objectid, name as name, thumbnail as thumbnail FROM games WHERE name = '" + game_name + r"'"
+        print game_name
+        print query
+        try:
+            log.info('querying database...')
+            DATABASE_URL = 'postgres://xsguljepueowms:IR7-TicHebWDkYr0WGZngcVsa5@ec2-23-21-157-223.compute-1.amazonaws.com:5432/d95o8es4f7241o'
+            engine = create_engine(DATABASE_URL)
+            selected_game = pd.read_sql_query(query, engine)
+            selected_game['rating'] = 3 # default rating
+            rated_games = rated_games.append(selected_game, ignore_index=True)
+            print rated_games
+
+            recs_html = render_template('game_rating_div.html',
+                                        name = selected_game['name'].iloc[0],
+                                        img = 'http:'+selected_game['thumbnail'].iloc[0],
+                                        objectid = selected_game['objectid'].iloc[0])
+
+            return jsonify(recs_html = recs_html, flag=0 )
+
+        except:
+            _, ex, _ = sys.exc_info()
+            log.error(ex.message)
+            return jsonify( flag=-1 )
+
+
 
 @app.route('/_recommend')
 def recommend():
+
+    global rated_games
+
     # apply filters based on user selections
     filter = {}
     if request.args.get('useplayers', type=str) == 'on':
@@ -210,21 +203,24 @@ def recommend():
             filter['family'] = family_args
     filtered_games = get_filtered_games(filter)
 
+
     # recommender logic goes here...
-    if DEMO:
+    if len(rated_games) == 0 or request.args.get('ignoreratings', type=str) == 'on' or use_gl=False: # recommend by popularity
+        rec_games = filtered_games
+    else: #use ratings to recommend
         filtered_games_SFrame = gl.SFrame(filtered_games[['objectid']])
         filtered_games_SFrame.rename({'objectid':'item_id'}) # recommender system needs this format
-        new_obs_data = gl.SFrame({'user_name' : ['web_user']*3,
-                                  'item_id' : [234, 243, 91],
-                                  'rating' : [10]*3})
+        new_obs_data = gl.SFrame({'user_name' : ['web_user']*len(rated_games),
+                                  'item_id' : [int(o) for o in rated_games['objectid']],
+                                  'rating' : [2*rating for rating in rated_games['rating']]}) # bgg scores are 1-10
         recommendations_SFrame = model.recommend(['web_user'],
                                           new_observation_data = new_obs_data, k=27,
+                                          diversity = 3,
                                           items=gl.SFrame(filtered_games_SFrame))
         recommendations_SFrame.rename({'item_id': 'objectid'})
         recommendations_df = recommendations_SFrame.to_dataframe()
         rec_games = pd.merge(recommendations_df, filtered_games, how='inner', on=['objectid'])
-    else:
-        rec_games = filtered_games
+
 
     CUTOFF = min(9, len(rec_games.index))
     rec_games = rec_games[0:CUTOFF]
@@ -243,57 +239,33 @@ def recommend():
         return jsonify(recs_html =  recs_html, flag=0 )
 
 
-@app.route('/figure1')
-def figure1():
-    return render_template('figure1.html', script=script1, div=div1)
+@app.route('/')
+def main():
+    return redirect('/index')
 
+@app.route('/index')
+def index():
+    return render_template('index.html')
 
-@app.route('/figure2')
-def figure2():
-    #  return render_template('figure1.html', script=script2, div=div2)
-    # return url_for('static', filename='figure2.html')
-    return render_template('figure2b.html')
+@app.route('/recommend')
+def rec():
+    global rated_games
+    rated_games = pd.DataFrame(columns=['objectid', 'name', 'thumbnail', 'rating'])
+    return render_template('recommender.html')
+
+@app.route('/_add_rating')
+def add_rating():
+    global rated_games
+    objectid = request.args.get('objectid', type=int)
+    rating = request.args.get('rating', type=float)
+    rated_games.loc[rated_games['objectid'] == objectid, 'rating']=rating
+    print rated_games
+    return jsonify(msg = 'Rating: {}'.format(int(rating)))
 
 
 @app.route('/explore')
 def game_ratings():
     return render_template('game_ratings.html')
-
-
-# @app.route('/rec_demo1')
-# def rec_demo1():
-#     return render_template('recommendation_demo_Core Eurogamer_top1000.html')
-#
-#
-# @app.route('/rec_demo2')
-# def rec_demo2():
-#     return render_template('recommendation_demo_Family_starwars_trivia.html')
-
-
-@app.route('/rec_demo3')
-def rec_demo3():
-    return render_template('recommendation_demo_War Gamer_.html')
-
-
-# @app.route('/rec_demo4')
-# def rec_demo4():
-#     return render_template('recommendation_demo_Family Eurogamer_kickstarter.html')
-#
-#
-# @app.route('/rec_demo5')
-# def rec_demo5():
-#     return render_template('recommendation_demo_Family Eurogamer_dinosaurs.html')
-#
-#
-# @app.route('/rec_demo6')
-# def rec_demo6():
-#     return render_template('recommendation_demo_Family Eurogamer_sherlock_holmes.html')
-#
-#
-# @app.route('/rec_demo7')
-# def rec_demo7():
-#     return render_template('recommendation_demo_Joke Game Fan_.html')
-
 
 if __name__ == '__main__':
     app.run(port=33507)
