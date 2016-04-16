@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
 
-if DEMO:
+if use_gl:
     import graphlab as gl
     model = gl.load_model('model/gl_model')
 
