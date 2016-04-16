@@ -1,5 +1,12 @@
+DEMO = False
+
 import numpy as np
 import pandas as pd
+rated_games = pd.DataFrame( columns = ['objectid','name','thumbnail','rating'])
+
+if DEMO:
+    import graphlab as gl
+    model = gl.load_model('model/gl_model')
 
 from bokeh.plotting import figure, show, output_file, ColumnDataSource
 from bokeh.embed import components
@@ -59,7 +66,6 @@ def parse_players(players_df):
     players_str = min_players + "-" + max_players + ' players'
     return players_str
 
-
 def parse_playtime(players_df, minmax=False):
     min_playtime = players_df['minplaytime'].astype(str)
     max_playtime = players_df['maxplaytime'].astype(str)
@@ -115,7 +121,7 @@ def get_filtered_games(filter_dict):
     else:
         qb = q1b
 
-    qb += ' ORDER BY games.rank LIMIT 30'
+    qb += ' ORDER BY games.rank'
     print qb
 
     try:
@@ -143,9 +149,44 @@ def index():
 
 
 @app.route('/recommend')
-def rec_demo():
+def rec():
+    global session_game_cntr
+    session_game_cntr = 0
     return render_template('recommender.html')
 
+@app.route('/_fetch_ratings_game')
+def fetch_ratings_game():
+
+    global session_game_cntr
+
+    logging.basicConfig(level=logging.INFO)
+    # get the logger for the current Python module
+    log = logging.getLogger(__name__)
+
+    game_name = request.args.get('name', type = str)
+    query = r"SELECT objectid as objectid, name as name, thumbnail as thumbnail FROM games WHERE name = '" + game_name + r"'"
+    print game_name
+    print query
+    try:
+        log.info('querying database...')
+        from sqlalchemy import create_engine
+        DATABASE_URL = 'postgres://xsguljepueowms:IR7-TicHebWDkYr0WGZngcVsa5@ec2-23-21-157-223.compute-1.amazonaws.com:5432/d95o8es4f7241o'
+        engine = create_engine(DATABASE_URL)
+        selected_game = pd.read_sql_query(query, engine)
+        selected_game['rating'] = np.nan
+#        rated_games.append(selected_game, inplace=True)
+    except:
+        _, ex, _ = sys.exc_info()
+        log.error(ex.message)
+        return pd.DataFrame  # defaults to empty dataframe
+
+    session_game_cntr += 1
+    recs_html = render_template('game_rating_div.html',
+                                session_game_number = session_game_cntr,
+                                name = selected_game['name'].iloc[0],
+                                img = 'http:'+selected_game['thumbnail'].iloc[0],
+                                objectid = selected_game['objectid'].iloc[0])
+    return jsonify(recs_html = recs_html, flag=0 )
 
 @app.route('/_recommend')
 def recommend():
@@ -170,10 +211,23 @@ def recommend():
     filtered_games = get_filtered_games(filter)
 
     # recommender logic goes here...
-    # for the moment, just recommend top games
+    if DEMO:
+        filtered_games_SFrame = gl.SFrame(filtered_games[['objectid']])
+        filtered_games_SFrame.rename({'objectid':'item_id'}) # recommender system needs this format
+        new_obs_data = gl.SFrame({'user_name' : ['web_user']*3,
+                                  'item_id' : [234, 243, 91],
+                                  'rating' : [10]*3})
+        recommendations_SFrame = model.recommend(['web_user'],
+                                          new_observation_data = new_obs_data, k=27,
+                                          items=gl.SFrame(filtered_games_SFrame))
+        recommendations_SFrame.rename({'item_id': 'objectid'})
+        recommendations_df = recommendations_SFrame.to_dataframe()
+        rec_games = pd.merge(recommendations_df, filtered_games, how='inner', on=['objectid'])
+    else:
+        rec_games = filtered_games
 
-    CUTOFF = min(9, len(filtered_games.index))
-    rec_games = filtered_games[0:CUTOFF]
+    CUTOFF = min(9, len(rec_games.index))
+    rec_games = rec_games[0:CUTOFF]
     rec_games['link'] = rec_games['objectid'].apply(lambda objectid: 'http://boardgamegeek.com/boardgame/{}'.format(objectid))
     rec_games['img'] = rec_games['thumbnail'].apply(lambda thumbnail: 'http:{}'.format(thumbnail))
 

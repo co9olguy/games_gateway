@@ -1,5 +1,16 @@
-  //player-range slider
-  $(function() {
+// show/hide filters
+$(function() {
+    $('#ignore-ratings-check').click(function(){
+      if($(this).prop("checked")) {
+        $('#get-ratings-div').hide();
+      } else {
+        $('#get-ratings-div').show();
+      }
+    });
+});
+
+//player-range slider
+$(function() {
     $( "#player-range" ).slider({
       range: true,
       min: 1,
@@ -15,10 +26,10 @@
     });
     $( "#player-amount" ).val( $( "#player-range" ).slider( "values", 0 ) +
       " - " + $( "#player-range" ).slider( "values", 1 ) );
-  });
+});
 
-  //time-range selector
-  $(function() {
+//time-range selector
+$(function() {
     $( "#time-range" ).slider({
       range: true,
       min: 0,
@@ -26,18 +37,18 @@
       values: [ 30, 120 ],
       step: 15,
       stop: function( event, ui ) {
-                                    $( "#time-check").prop("checked", true);
-                                    return true},
+                $( "#time-check").prop("checked", true);
+                return true},
       slide: function( event, ui ) {
         $( "#time-amount" ).val( ui.values[ 0 ] + " - " + ui.values[ 1 ] )
       }
     });
     $( "#time-amount" ).val( $( "#time-range" ).slider( "values", 0 ) +
       " - " + $( "#time-range" ).slider( "values", 1 ) );
-  });
+});
 
-  //minimum age selector
-  $(function() {
+//minimum age selector
+$(function() {
     $( "#minage-slider" ).slider({
       min: 0,
       max: 18,
@@ -51,11 +62,12 @@
       }
     });
     $( "#minage-amount" ).val( $( "#minage-slider" ).slider( "values", 0 ) );
-  });
+});
 
-  //submit button
-  $(function() {
-    $( "#submit-button" ).click(function() {
+//submit button
+$(function() {
+      $( "#submit-button" ).click(function() {
+
       // get data to feed to app
       $.getJSON(
       $SCRIPT_ROOT + '/_recommend',
@@ -70,7 +82,7 @@
         useplaytime: $( '#time-check:checked' ).val(),
         useage: $( '#age-check:checked' ).val(),
         usecategory: $( '#category-check:checked' ).val(),
-        usefamily: $( '#family-check:checked' ).val()
+        usefamily: $( '#family-check:checked' ).val(),
       },
 
       //display returned data
@@ -85,4 +97,4 @@
       });
       return false;
     });
-  });
+});
