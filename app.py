@@ -3,10 +3,16 @@ use_gl = True
 import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
+from bokeh.plotting import Figure
+from bokeh.models import Range1d, ColumnDataSource, HoverTool
+from bokeh.embed import components
+from bokeh.models.widgets import HBox, Slider, VBoxForm, Select, TextInput
+from bokeh.io import curdoc
 
 if use_gl:
     import graphlab as gl
-    model = gl.load_model('model/gl_model')
+    #model = gl.load_model('model/gl_model')
+    model = gl.load_model('model/model_12ft_lr0.01_iter1000')
 
 from bokeh.plotting import figure, show, output_file, ColumnDataSource
 from bokeh.embed import components
@@ -205,7 +211,7 @@ def recommend():
 
 
     # recommender logic goes here...
-    if len(rated_games) == 0 or request.args.get('ignoreratings', type=str) == 'on' or use_gl=False: # recommend by popularity
+    if len(rated_games) == 0 or request.args.get('ignoreratings', type=str) == 'on' or use_gl==False: # recommend by popularity
         rec_games = filtered_games
     else: #use ratings to recommend
         filtered_games_SFrame = gl.SFrame(filtered_games[['objectid']])
@@ -215,7 +221,7 @@ def recommend():
                                   'rating' : [2*rating for rating in rated_games['rating']]}) # bgg scores are 1-10
         recommendations_SFrame = model.recommend(['web_user'],
                                           new_observation_data = new_obs_data, k=27,
-                                          diversity = 3,
+                                          diversity = 0,
                                           items=gl.SFrame(filtered_games_SFrame))
         recommendations_SFrame.rename({'item_id': 'objectid'})
         recommendations_df = recommendations_SFrame.to_dataframe()
@@ -264,8 +270,110 @@ def add_rating():
 
 
 @app.route('/explore')
-def game_ratings():
+def explorer_page():
     return render_template('game_ratings.html')
+
+@app.route('/_explore')
+def update_explorer():
+    #query = "SELECT * FROM games WHERE rank <= 100 LIMIT 100"
+    #DATABASE_URL = 'postgres://xsguljepueowms:IR7-TicHebWDkYr0WGZngcVsa5@ec2-23-21-157-223.compute-1.amazonaws.com:5432/d95o8es4f7241o'
+    #engine = create_engine(DATABASE_URL)
+    #games = pd.read_sql_query(query, engine)
+    games = pd.read_csv('static/games_full.csv')
+
+    games["color"] = "blue"
+    games.fillna(0, inplace=True)
+
+    axis_map = {
+        "Year Published": "yearpublished",
+        "Average boardgamegeek Rating": "bayes_avg_rating",
+        "Rank": "rank",
+        "Min Players": "minplayers",
+        "Max Players": "maxplayers",
+        "Min Playtime": "minplaytime",
+        "Max Playtime": "maxplaytime",
+        "Min Age": "minage"
+    }
+    ordered_keys = [
+        "Year Published",
+        "Average boardgamegeek Rating",
+        "Rank",
+        "Min Players",
+        "Max Players",
+        "Min Playtime",
+        "Max Playtime",
+        "Min Age"
+    ]
+
+    # Create Column Data Source that will be used by the plot
+    source = ColumnDataSource(data=dict(x=[], y=[], color=[], name=[], year=[], thumbnail=[]))
+
+    hover = HoverTool(
+        tooltips="""
+            <section style="width:350px; float:left; padding:10px;">
+                    <img src="@img" height="42" alt="@name" width="42" style="float: left; margin: 0px 15px 15px 0px;" border="2"></img>
+                    <span style="font-size: 17px; font-weight: bold;">@name (@year)</span>
+            </section>
+            """)
+
+    #name = TextInput(title="Name contains")
+    x_axis = Select(title="X Axis", options=ordered_keys, value="Year Published")
+    y_axis = Select(title="Y Axis", options=ordered_keys, value="Average boardgamegeek Rating")
+
+    filter = {}
+    filter['minplayers'] = request.args.get('minplayers', type=int)
+    filter['maxplayers'] = request.args.get('maxplayers', type=int)
+    filter['minplaytime'] = request.args.get('minplaytime', type=int)
+    filter['maxplaytime'] = request.args.get('maxplaytime', type=int)
+    filter['minyear'] = request.args.get("minyear", type=int)
+    filter['maxyear'] = request.args.get("maxyear", type=int)
+    filter['minage'] = request.args.get("minage", type=int)
+    filter['rank'] = request.args.get("rank", type=int)
+
+    p = Figure(plot_height=600, plot_width=800, title="", toolbar_location=None, tools=[hover])
+    p.circle(x="x", y="y", source=source, size=7, color="color", line_color=None, fill_alpha=0.25)
+
+    def select_games():
+        selected = games[
+            #(games["yearpublished"] >= year.value) &
+            (games["maxplayers"] <= filter['maxplayers']) &
+            (games["minplayers"] >= filter['minplayers']) &
+            (games["maxplaytime"] <= filter['maxplaytime']) &
+            (games["minplaytime"] >= filter['minplaytime']) &
+            (games["yearpublished"] >= filter['minyear']) &
+            (games["yearpublished"] <= filter['maxyear']) &
+            (games["minage"] >= filter['minage']) &
+            (games["rank"] <= filter['rank'])
+            ]
+        #name_val = name.value.strip()
+        #if (name_val != ""):
+        #    selected = selected[selected.name.str.contains(name_val) == True]
+        return selected
+
+    def update(attrname, old, new):
+        df = select_games()
+        x_name = axis_map["Year Published"]
+        y_name = axis_map["Rank"]
+
+        x_name = axis_map[x_axis.value]
+        y_name = axis_map[y_axis.value]
+
+        p.xaxis.axis_label = x_axis.value
+        p.yaxis.axis_label = y_axis.value
+        p.title = "%d games selected" % len(df)
+        source.data = dict(
+            x=df[x_name],
+            y=df[y_name],
+            color=df["color"],
+            name=df["name"],
+            year=df["yearpublished"],
+            img=df['thumbnail'].apply(lambda s: 'http:'+str(s))
+        )
+
+    update(None, None, None)  # initial view
+
+    script, div = components(p)
+    return jsonify(plot=render_template('tmp.html',script=script, div=div), flag = 0)
 
 if __name__ == '__main__':
     app.run(port=33507)

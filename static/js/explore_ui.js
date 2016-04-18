@@ -1,13 +1,3 @@
-// show/hide filters
-$(function() {
-    $('#ignore-ratings-check').click(function(){
-      if($(this).prop("checked")) {
-        $('#get-ratings-div').hide();
-      } else {
-        $('#get-ratings-div').show();
-      }
-    });
-});
 
 //player-range slider
 $(function() {
@@ -20,6 +10,7 @@ $(function() {
         $( "#player-amount" ).val( ui.values[ 0 ] + " - " + ui.values[ 1 ] );
       },
       stop: function( event, ui ) {
+            updatePlot();
             $( "#player-check").prop("checked", true);
             return true
       }
@@ -34,10 +25,11 @@ $(function() {
       range: true,
       min: 0,
       max: 600,
-      values: [ 30, 120 ],
+      values: [ 60, 90 ],
       step: 15,
       stop: function( event, ui ) {
                 $( "#time-check").prop("checked", true);
+                updatePlot();
                 return true},
       slide: function( event, ui ) {
         $( "#time-amount" ).val( ui.values[ 0 ] + " - " + ui.values[ 1 ] )
@@ -52,52 +44,90 @@ $(function() {
     $( "#minage-slider" ).slider({
       min: 0,
       max: 18,
-      values: [ 8 ],
+      values: [ 12 ],
       slide: function( event, ui ) {
         $( "#minage-amount" ).val( ui.values[ 0 ])
       },
       stop: function( event, ui ) {
             $( "#age-check").prop("checked", true);
+            updatePlot();
             return true
       }
     });
     $( "#minage-amount" ).val( $( "#minage-slider" ).slider( "values", 0 ) );
 });
 
-//submit button
+//rank selector
 $(function() {
-      $( "#submit-button" ).click(function() {
+    $( "#rank-slider" ).slider({
+      min: 0,
+      max: 10000,
+      step: 100,
+      values: [ 1000 ],
+      slide: function( event, ui ) {
+        $( "#rank-amount" ).val( ui.values[ 0 ])
+      },
+      stop: function( event, ui ) {
+            $( "#rank-check").prop("checked", true);
+            updatePlot();
+            return true
+      }
+    });
+    $( "#rank-amount" ).val( $( "#rank-slider" ).slider( "values", 0 ) );
+});
 
-      $( "#recs-container" ).prepend('Searching for games...');
+//year-range selector
+$(function() {
+    $( "#year-range" ).slider({
+      range: true,
+      min: -3500,
+      max: 2016,
+      values: [ 1500, 2016 ],
+      step: 1,
+      stop: function( event, ui ) {
+                $( "#year-check").prop("checked", true);
+                updatePlot();
+                return true},
+      slide: function( event, ui ) {
+        $( "#year-amount" ).val( ui.values[ 0 ] + " to " + ui.values[ 1 ] )
+      }
+    });
+    $( "#year-amount" ).val( $( "#year-range" ).slider( "values", 0 ) +
+      " to " + $( "#year-range" ).slider( "values", 1 ) );
+});
 
+// function to update bokeh plot
+function updatePlot(){
+      $( '#status-msg' ).empty().html('Updating plot...')
       // get data to feed to app
       $.getJSON(
-      $SCRIPT_ROOT + '/_recommend',
+      $SCRIPT_ROOT + '/_explore',
       { minplayers: $( "#player-range" ).slider( "values", 0 ),
         maxplayers: $( "#player-range" ).slider( "values", 1 ),
         minplaytime: $( "#time-range" ).slider( "values", 0 ),
         maxplaytime: $( "#time-range" ).slider( "values", 1 ),
         minage: $( "#minage-slider" ).slider( "values", 0 ),
-        category: $( "#categories" ).val(),
-        family: $( "#families" ).val(),
+        minyear: $( "#year-range" ).slider( "values", 0 ),
+        maxyear: $( "#year-range" ).slider( "values", 1 ),
+        rank: $( '#rank-slider' ).slider( "values", 0 ),
         useplayers: $( '#player-check:checked' ).val(),
         useplaytime: $( '#time-check:checked' ).val(),
-        useage: $( '#age-check:checked' ).val(),
-        usecategory: $( '#category-check:checked' ).val(),
-        usefamily: $( '#family-check:checked' ).val(),
-        ignoreratings: $( '#ignore-ratings-check:checked' ).val()
+        useage: $( '#age-check:checked' ).val()
       },
 
       //display returned data
       function( data ) {
         if ( data.flag == 0 ){
-          var recs_html = data.recs_html;
-          $( "#recs-container" ).empty().append(recs_html);
+          var plot = data.plot;
+          $( '#status-msg' ).empty().html('<br>')
+          $( "#plot-container" ).empty().append(plot);
         }
         else {
-          $( "#recs-container" ).empty().text( data.return_string );
+          $( "#plot-container" ).empty().text( data.return_string );
         };
       });
-      return false;
-    });
+
+}
+$(document).ready(function(){
+    updatePlot();
 });
