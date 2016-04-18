@@ -68,12 +68,12 @@
       </div>
     </div>
 
-	<div class="container">
+	<div class="container centered" style="margin-top:50px;">
+        <h1>Game Explorer</h1>
+        <h4>Hover over dots to see games</h4>
 		<div class="row centered mt mb">
-			<h1>Game Explorer</h1>
-            <h4>Hover over dots to see games</h4>
             <br>
-            <div id=controls" style="text-align:left;">
+            <div id=controls" style="text-align:left;width:340px;float:left;">
                 <!--<input type="checkbox" id="player-check">-->
                 <label for="player-check" style="font-size:14pt">Number of players:</label>
                 <input type="text" id="player-amount" readonly style="border:0; color:#000000; font-weight:bold; width:75px; background-color:transparent; font-size:14pt">
@@ -110,15 +110,43 @@
                 <br>
 
                 <p>
-                <label for="rank-check" style="font-size:14pt">Boardgamegeek Ranking:</label>
+                <label for="rank-check" style="font-size:14pt">Boardgamegeek Rank:</label>
                 <input type="text" id="rank-amount" readonly style="border:0; color:#000000; font-weight:bold; width:70px; background-color:transparent; font-size:14pt">
                 </p>
                 <div id="rank-slider" style="width:200px"></div>
 
+                <br>
+
+                <p><label for="x-axis">X-axis:</label></p>
+                <select name="x-axis" id="x-axis">
+                  <option>Average Rating</option>
+                  <option>Min Players</option>
+                  <option>Max Players</option>
+                  <option>Min Playtime</option>
+                  <option>Max Playtime</option>
+                  <option selected="selected">Year Published</option>
+                  <option>Min Age</option>
+                  <option>Boardgamegeek Rank</option>
+                </select>
+
+                <br>
+
+                <p><label for="y-axis">Y-axis:</label></p>
+                <select name="y-axis" id="y-axis">
+                  <option selected="selected">Average Rating</option>
+                  <option>Min Players</option>
+                  <option>Max Players</option>
+                  <option>Min Playtime</option>
+                  <option>Max Playtime</option>
+                  <option>Year Published</option>
+                  <option>Min Age</option>
+                  <option>Boardgamegeek Rank</option>
+                </select>
+
             </div>
-            <br>
-            <span id="status-msg"></span>
-            <div id="plot-container" style="text-align:left;"></div> <!--plot div-->
+                <div id="plot-container" style="text-align:left;float:right;">
+                <div id="status-msg"></div>
+            </div> <!--plot div-->
 
 		</div><! --/row -->
 	</div><! --/container -->

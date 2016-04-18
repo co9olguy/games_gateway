@@ -286,8 +286,8 @@ def update_explorer():
 
     axis_map = {
         "Year Published": "yearpublished",
-        "Average boardgamegeek Rating": "bayes_avg_rating",
-        "Rank": "rank",
+        "Average Rating": "bayes_avg_rating",
+        "Boardgamegeek Rank": "rank",
         "Min Players": "minplayers",
         "Max Players": "maxplayers",
         "Min Playtime": "minplaytime",
@@ -329,6 +329,8 @@ def update_explorer():
     filter['maxyear'] = request.args.get("maxyear", type=int)
     filter['minage'] = request.args.get("minage", type=int)
     filter['rank'] = request.args.get("rank", type=int)
+    x_axis = request.args.get("xaxis")
+    y_axis = request.args.get("yaxis")
 
     p = Figure(plot_height=600, plot_width=800, title="", toolbar_location=None, tools=[hover])
     p.circle(x="x", y="y", source=source, size=7, color="color", line_color=None, fill_alpha=0.25)
@@ -352,14 +354,12 @@ def update_explorer():
 
     def update(attrname, old, new):
         df = select_games()
-        x_name = axis_map["Year Published"]
-        y_name = axis_map["Rank"]
 
-        x_name = axis_map[x_axis.value]
-        y_name = axis_map[y_axis.value]
+        x_name = axis_map[x_axis]
+        y_name = axis_map[y_axis]
 
-        p.xaxis.axis_label = x_axis.value
-        p.yaxis.axis_label = y_axis.value
+        p.xaxis.axis_label = x_axis
+        p.yaxis.axis_label = y_axis
         p.title = "%d games selected" % len(df)
         source.data = dict(
             x=df[x_name],

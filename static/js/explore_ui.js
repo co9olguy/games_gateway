@@ -5,7 +5,7 @@ $(function() {
       range: true,
       min: 1,
       max: 15,
-      values: [ 2, 4 ],
+      values: [ 2, 8 ],
       slide: function( event, ui ) {
         $( "#player-amount" ).val( ui.values[ 0 ] + " - " + ui.values[ 1 ] );
       },
@@ -25,7 +25,7 @@ $(function() {
       range: true,
       min: 0,
       max: 600,
-      values: [ 60, 90 ],
+      values: [ 0, 180 ],
       step: 15,
       stop: function( event, ui ) {
                 $( "#time-check").prop("checked", true);
@@ -44,7 +44,7 @@ $(function() {
     $( "#minage-slider" ).slider({
       min: 0,
       max: 18,
-      values: [ 12 ],
+      values: [ 0 ],
       slide: function( event, ui ) {
         $( "#minage-amount" ).val( ui.values[ 0 ])
       },
@@ -82,7 +82,7 @@ $(function() {
       range: true,
       min: -3500,
       max: 2016,
-      values: [ 1500, 2016 ],
+      values: [ 1900, 2016 ],
       step: 1,
       stop: function( event, ui ) {
                 $( "#year-check").prop("checked", true);
@@ -96,9 +96,20 @@ $(function() {
       " to " + $( "#year-range" ).slider( "values", 1 ) );
 });
 
+// axis select-menus
+$(function() {
+    $( "#x-axis" ).selectmenu({
+        select: function( event, ui ) {updatePlot()}
+    });
+    $( "#y-axis" ).selectmenu({
+        select: function( event, ui ) {updatePlot()}
+    });
+});
+
+
 // function to update bokeh plot
 function updatePlot(){
-      $( '#status-msg' ).empty().html('Updating plot...')
+      $( '#plot-container' ).empty().html('<img src="http://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif">')
       // get data to feed to app
       $.getJSON(
       $SCRIPT_ROOT + '/_explore',
@@ -110,6 +121,8 @@ function updatePlot(){
         minyear: $( "#year-range" ).slider( "values", 0 ),
         maxyear: $( "#year-range" ).slider( "values", 1 ),
         rank: $( '#rank-slider' ).slider( "values", 0 ),
+        xaxis: $( '#x-axis' ).val(),
+        yaxis: $( '#y-axis' ).val(),
         useplayers: $( '#player-check:checked' ).val(),
         useplaytime: $( '#time-check:checked' ).val(),
         useage: $( '#age-check:checked' ).val()
@@ -119,7 +132,7 @@ function updatePlot(){
       function( data ) {
         if ( data.flag == 0 ){
           var plot = data.plot;
-          $( '#status-msg' ).empty().html('<br>')
+          $( '#status-msg' ).empty()
           $( "#plot-container" ).empty().append(plot);
         }
         else {
