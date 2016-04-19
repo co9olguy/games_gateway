@@ -97,8 +97,9 @@
 <hr>
 
         <div class="container" id="get-ratings-div" style="text-align:center;">
-            <h3>What games do you like?</h3>
-            <p>(The more ratings you give, the more personalized the recommendations)</p>
+            <h3>What games have you played?</h3>
+            <p>Enter games in the box below. <br>
+               The more ratings you give, the more personalized the recommendations</p>
             <input id="ratings-getter"  style="width:400px">
             <div class="container" style="padding-top:15px;">
                 <div class="row centered mt mb" id="ratings-displayer" style="width:90%;height:100px">
@@ -106,25 +107,36 @@
             </div>
         </div>
         <div class="container" style="text-align:center;padding-top:25px;">
-                <input type="checkbox" id="ignore-ratings-check" style="padding-top:20px;"><label for="ignore-ratings-check" id = "ignore-ratings-label"> Ignore ratings (recommend by popularity) </label>
+            <div style="float:left;">
+                <input type="checkbox" id="bgg-username-check" style="padding-top:20px;"><label for="bgg-username-check" id = "bgg-username-check-label"> Use my boardgamegeek username </label>
+            </div>
+            <div style="float:right;">
+                <input type="checkbox" class="centered" id="ignore-ratings-check" style="padding-top:20px;"><label for="ignore-ratings-check" id = "ignore-ratings-label"> Ignore ratings </label>
+            </div>
+            <div id="get-username-div" style="float:left;padding-left: 10px;">
+                <input id="username-textbox" style="width:150px;">
+            </div>
         </div>
 <hr>
 
-        <div class="container centered" id="filter-div">
+        <div class="container-fluid" id="filter-div" style="text-align:center;">
             <h3>What else is important?</h3>
-            <div class="row centered mt mb">
+            <div class="row">
+
+			<div class="col-lg-6">
+
               <input type="checkbox" id="player-check">
               <label for="player-check" style="font-size:14pt">Number of players:</label>
               <input type="text" id="player-amount" readonly style="border:0; color:#000000; font-weight:bold; width:75px; background-color:transparent; font-size:14pt">
 
-                <div id="player-range" style="width:400px"></div>
+                <div id="player-range" style="width:300px;margin:auto;"></div>
                 <br>
                 <p>
                   <input type="checkbox" id="time-check">
                   <label for="time-check" style="font-size:14pt">Time range (min):</label>
                   <input type="text" id="time-amount" readonly style="border:0; color:#000000; font-weight:bold; width:100px; background-color:transparent; font-size:14pt">
                 </p>
-                <div id="time-range" style="width:400px"></div>
+                <div id="time-range" style="width:300px;margin:auto;"></div>
 
                 <br>
 
@@ -133,28 +145,37 @@
                   <label for="age-check" style="font-size:14pt">Minimum age:</label>
                   <input type="text" id="minage-amount" readonly style="border:0; color:#000000; font-weight:bold; width:70px; background-color:transparent; font-size:14pt">
                 </p>
-                <div id="minage-slider" style="width:400px"></div>
+                <div id="minage-slider" style="width:300px;margin:auto;"></div>
+
+                <br>
+
+
+			</div>
+			<div class="col-lg-6">
+
 
                 <br>
                 <input type="checkbox" id="category-check">
                 <label for="category-check" style="font-size:14pt">Board game category: </label>
                 <br>
-                  <input id="categories"  style="width:400px">
+                  <input id="categories"  style="width:300px">
                 <br>
                 <br>
 
                 <input type="checkbox" id="family-check">
-                <label for="family-check" style="font-size:14pt">Board game family: </label><br>
-                  <input id="families" style="width:400px">
+                <label for="family-check" style="font-size:14pt">Key words: </label><br>
+                  <input id="families" style="width:300px">
 
                 <br>
                 <br>
+			</div>
+
 
                 <button id="submit-button" style="font-size:14pt">Submit</button>
 
             </div><! --/row -->
         </div><! --/container -->
-
+<hr>
 	<div class="container" id="recs-container" style="width:90%;padding-top:50px;margin-bottom:50px">
 		<div class="row centered mt mb" style="width:90%;margin-top:50px">
 			<h2 style="text-align:center;">Your Recommendations</h2>

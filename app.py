@@ -211,15 +211,27 @@ def recommend():
 
 
     # recommender logic goes here...
-    if len(rated_games) == 0 or request.args.get('ignoreratings', type=str) == 'on' or use_gl==False: # recommend by popularity
+    if request.args.get('usernamecheck', type=str) == 'off' and (len(rated_games) == 0 or
+                                                                 request.args.get('ignoreratings', type=str) == 'on' or
+                                                                 use_gl==False): # recommend by popularity
         rec_games = filtered_games
     else: #use ratings to recommend
+        if request.args.get('usernamecheck', type=str) == 'on':
+            rec_username = request.args.get('username', type=str)
+        else:
+            rec_username = 'gg_web_user_dummy'
         filtered_games_SFrame = gl.SFrame(filtered_games[['objectid']])
         filtered_games_SFrame.rename({'objectid':'item_id'}) # recommender system needs this format
-        new_obs_data = gl.SFrame({'user_name' : ['web_user']*len(rated_games),
-                                  'item_id' : [int(o) for o in rated_games['objectid']],
-                                  'rating' : [2*rating for rating in rated_games['rating']]}) # bgg scores are 1-10
-        recommendations_SFrame = model.recommend(['web_user'],
+        if request.args.get('ignoreratings', type=str) == 'on':
+            new_obs_data = gl.SFrame({'user_name' : [],
+                                      'item_id' : [],
+                                      'rating' : []})
+        else:
+            new_obs_data = gl.SFrame({'user_name' : [rec_username]*len(rated_games),
+                                      'item_id' : [int(o) for o in rated_games['objectid']],
+                                      'rating' : [2*rating for rating in rated_games['rating']]}) # bgg scores are 1-10
+
+        recommendations_SFrame = model.recommend([rec_username],
                                           new_observation_data = new_obs_data, k=27,
                                           diversity = 0,
                                           items=gl.SFrame(filtered_games_SFrame))

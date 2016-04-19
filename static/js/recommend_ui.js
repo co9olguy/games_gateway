@@ -9,6 +9,21 @@ $(function() {
     });
 });
 
+$(function() {
+    $('#bgg-username-check').click(function(){
+      if($(this).prop("checked")) {
+        $('#get-username-div').show();
+      } else {
+        $('#get-username-div').hide();
+      }
+    });
+});
+
+// hide username-box on page load
+$(function(){
+    $('#get-username-div').hide();
+});
+
 //player-range slider
 $(function() {
     $( "#player-range" ).slider({
@@ -73,7 +88,8 @@ $(function() {
       // get data to feed to app
       $.getJSON(
       $SCRIPT_ROOT + '/_recommend',
-      { minplayers: $( "#player-range" ).slider( "values", 0 ),
+      { username: $('#username-textbox').val(),
+        minplayers: $( "#player-range" ).slider( "values", 0 ),
         maxplayers: $( "#player-range" ).slider( "values", 1 ),
         minplaytime: $( "#time-range" ).slider( "values", 0 ),
         maxplaytime: $( "#time-range" ).slider( "values", 1 ),
@@ -85,7 +101,8 @@ $(function() {
         useage: $( '#age-check:checked' ).val(),
         usecategory: $( '#category-check:checked' ).val(),
         usefamily: $( '#family-check:checked' ).val(),
-        ignoreratings: $( '#ignore-ratings-check:checked' ).val()
+        ignoreratings: $( '#ignore-ratings-check:checked' ).val(),
+        usernamecheck: $( '#bgg-username-check:checked' ).val()
       },
 
       //display returned data
