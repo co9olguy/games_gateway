@@ -109,7 +109,7 @@ $(function() {
 
 // function to update bokeh plot
 function updatePlot(){
-      $( '#plot-container' ).empty().html('<img src="http://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif">')
+      $( '#plot-container' ).empty().html('<img src="http://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif" style="float:left;">')
       // get data to feed to app
       $.getJSON(
       $SCRIPT_ROOT + '/_explore',

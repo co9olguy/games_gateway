@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="assets/ico/favicon.ico">
+
+    <title>Games Gateway - Game Explorer</title>
+
+      <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+      <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+      <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+      <script type=text/javascript>
+      $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+      </script>
+
+
+        <!-- Bootstrap core CSS -->
+        <link href="{{ url_for('static', filename="css/bootstrap.css") }}" rel="stylesheet">
+        <!-- Custom styles for this template -->
+        <link href="{{ url_for('static', filename="css/style.css") }}" rel="stylesheet">
+        <link href="{{ url_for('static', filename="css/font-awesome.min.css") }}" rel="stylesheet">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+          <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+
+        <link rel="stylesheet" href="http://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.css" type="text/css" />
+        <script type="text/javascript" src="http://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.js"></script>
+        <script type="text/javascript">
+            Bokeh.set_log_level("info");
+        </script>
+
+
+
+  </head>
+
+  <body>
+
+    <!-- Static navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="index">GAMES GATEWAY</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <!--<li class="active"><a href="index.html">Home</a></li>-->
+            <li><a href="/explore">Explore</a></li>
+            <li><a href="/recommend">Recommend</a></li>
+            <li><a href="/about">About</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+	<div class="container centered" style="margin-top:50px;">
+        <div id="details">
+            <h1>Project Details</h1>
+            <hr>
+            <ul class="list-group" style="font-size:24px;border-top: 0 none;">
+                <li class="list-group-item" style="border:none;"><strong>5GB</strong> of data scraped from boardgamegeek.com</li>
+                <li class="list-group-item" style="border:none;"><strong>4.4 million+</strong> ratings</li>
+                <li class="list-group-item" style="border:none;"><strong>115,000+</strong> unique users</li>
+                <li class="list-group-item" style="border:none;"><strong>70,000+</strong> games</li>
+                <li class="list-group-item" style="border:none;"><strong>~<strong>38</strong> ratings/user</strong> games</li>
+            </ul>
+        </div>
+        <hr>
+        <div id="how-works">
+            <h1>How does it work?</h1>
+            <p>
+                The recommender system is based on a method called <strong>collaborative filtering</strong>.
+                We start with a big database of users and games. Users will have rated some games, but many of these entries will be missing.
+                The recommender's job is to predict which scores the user would give the unrated games.
+            </p>
+            <br>
+            <img src="{{ url_for('static', filename='img/recsys_matrix_sm.png') }}" style="width:1000px;padding-bottom:15px;">
+            <br>
+            <p>
+                From the above ratings, we might say that User 1 likes any game related to <i>Settlers of Catan</i>,
+                User 2 is into pirates, and User 3 is a fan of games made by <i>Days of Wonder</i>.
+                It's impossible to say anything about User 4 because we have no useful
+                ratings data. This is known as the <strong>cold start problem</strong>.
+            </p>
+            <br>
+            <p>
+                We should recommend games that match each user's specific preferences. Rather than trying to figure out
+                which topics are of interest to our users, we use a machine Learning algorithm based on
+                <strong>matrix factorization</strong> of the ratings data. This algorithm automatically discovers a small number of features
+                which best capture the ratings data. Each user and game are weighted by how well these features represent them.
+            </p>
+            <br>
+            <img src="{{ url_for('static', filename='img/recsys_sm.png') }}" style="width:1000px;padding-bottom:15px;">
+            <br>
+            <p>
+                The learned features give us a compact way to represent user/game pairs. To find out which games we
+                should recommend to a User 1, we vector-multiply the first row of the left matrix by each column from the right matrix.
+                These products are our predictions for User 1's rating of each  We now recommend the games whose predicted
+                rating is the highest.
+            </p>
+            <br>
+        </div>
+	</div><! --/container -->
+
+
+	<div id="footerwrap">
+		<div class="container">
+			<div class="row centered">
+				<div class="col-lg-4">
+					<p><b>Built by Nathan Killoran</b></p>
+				</div>
+
+				<div class="col-lg-4">
+					<p>Fellow at the Data Incubator</p>
+				</div>
+				<div class="col-lg-4">
+					<p>nkilloran@gmail.com</p>
+				</div>
+			</div>
+		</div>
+	</div><! --/footerwrap -->
+
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  </body>
+</html>

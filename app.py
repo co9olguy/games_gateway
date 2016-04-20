@@ -1,3 +1,4 @@
+DEMO = True
 use_gl = True
 
 import numpy as np
@@ -8,6 +9,7 @@ from bokeh.models import Range1d, ColumnDataSource, HoverTool
 from bokeh.embed import components
 from bokeh.models.widgets import HBox, Slider, VBoxForm, Select, TextInput
 from bokeh.io import curdoc
+import sqlite3
 
 if use_gl:
     import graphlab as gl
@@ -19,6 +21,12 @@ from bokeh.embed import components
 
 import logging
 import sys
+
+if DEMO:
+    engine = sqlite3.connect('workspace/bgg_demo.sqlite')
+else:
+    DATABASE_URL = 'postgres://xsguljepueowms:IR7-TicHebWDkYr0WGZngcVsa5@ec2-23-21-157-223.compute-1.amazonaws.com:5432/d95o8es4f7241o'
+    engine = create_engine(DATABASE_URL)
 
 from flask import Flask, render_template, request, redirect, jsonify
 
@@ -132,8 +140,6 @@ def get_filtered_games(filter_dict):
 
     try:
         log.info('querying database...')
-        DATABASE_URL = 'postgres://xsguljepueowms:IR7-TicHebWDkYr0WGZngcVsa5@ec2-23-21-157-223.compute-1.amazonaws.com:5432/d95o8es4f7241o'
-        engine = create_engine(DATABASE_URL)
         filtered_games = pd.read_sql_query(qb, engine)
 
         return filtered_games
@@ -163,8 +169,6 @@ def fetch_ratings_game():
         print query
         try:
             log.info('querying database...')
-            DATABASE_URL = 'postgres://xsguljepueowms:IR7-TicHebWDkYr0WGZngcVsa5@ec2-23-21-157-223.compute-1.amazonaws.com:5432/d95o8es4f7241o'
-            engine = create_engine(DATABASE_URL)
             selected_game = pd.read_sql_query(query, engine)
             selected_game['rating'] = 3 # default rating
             rated_games = rated_games.append(selected_game, ignore_index=True)
@@ -280,6 +284,9 @@ def add_rating():
     print rated_games
     return jsonify(msg = 'Rating: {}'.format(int(rating)))
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
 
 @app.route('/explore')
 def explorer_page():
