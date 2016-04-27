@@ -63,7 +63,7 @@ $(function() {
       min: 0,
       max: 10000,
       step: 100,
-      values: [ 1000 ],
+      values: [ 2000 ],
       slide: function( event, ui ) {
         $( "#rank-amount" ).val( ui.values[ 0 ])
       },
@@ -82,7 +82,7 @@ $(function() {
       range: true,
       min: -3500,
       max: 2016,
-      values: [ 1900, 2016 ],
+      values: [ 1980, 2016 ],
       step: 1,
       stop: function( event, ui ) {
                 $( "#year-check").prop("checked", true);

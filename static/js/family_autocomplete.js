@@ -1,6 +1,7 @@
 //family box autocomplete
 $(function() {
         var availableFamilies = [
+            "Game of Thrones",
             '"Storm Over" area impulse series',
             "10 Days in...",
             "18xx",

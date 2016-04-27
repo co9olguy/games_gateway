@@ -121,13 +121,13 @@
                 <p><label for="x-axis">X-axis:</label></p>
                 <select name="x-axis" id="x-axis">
                   <option>Average Rating</option>
+                  <option>Boardgamegeek Rank</option>
                   <option>Min Players</option>
                   <option>Max Players</option>
                   <option>Min Playtime</option>
                   <option>Max Playtime</option>
                   <option selected="selected">Year Published</option>
                   <option>Min Age</option>
-                  <option>Boardgamegeek Rank</option>
                 </select>
 
                 <br>
@@ -135,17 +135,19 @@
                 <p><label for="y-axis">Y-axis:</label></p>
                 <select name="y-axis" id="y-axis">
                   <option selected="selected">Average Rating</option>
+                  <option>Boardgamegeek Rank</option>
                   <option>Min Players</option>
                   <option>Max Players</option>
                   <option>Min Playtime</option>
                   <option>Max Playtime</option>
                   <option>Year Published</option>
                   <option>Min Age</option>
-                  <option>Boardgamegeek Rank</option>
                 </select>
 
             </div>
-                <div id="plot-container" style="text-align:left;float:right;">
+                <!--for 1024 resolution, use float:left;-->
+                <!--for 1920 resolution, use float:right-->
+                <div id="plot-container" style="text-align:left;float:left;">
                 <div id="status-msg"></div>
             </div> <!--plot div-->
 

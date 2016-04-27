@@ -8,7 +8,7 @@
     <meta name="author" content="">
     <link rel="shortcut icon" href="assets/ico/favicon.ico">
 
-    <title>Games Gateway - Game Explorer</title>
+    <title>Games Gateway - About the project</title>
 
       <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
       <script src="//code.jquery.com/jquery-1.10.2.js"></script>
@@ -78,9 +78,30 @@
                 <li class="list-group-item" style="border:none;"><strong>70,000+</strong> games</li>
                 <li class="list-group-item" style="border:none;"><strong>~<strong>38</strong> ratings/user</strong> games</li>
             </ul>
+
+            <div class="container centered">
+                <div class="col-lg-3 col-md-3 col-sm-3 gallery">
+                    <img src="{{ url_for('static', filename='img/logos/python.jpg') }}" class="img-responsive" style="width:100%;"></a>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 gallery">
+                    <img src="{{ url_for('static', filename='img/logos/jquery_flat.png') }}" class="img-responsive" style="width:100%"></a>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 gallery">
+                    <img src="{{ url_for('static', filename='img/logos/postgres.gif') }}" class="img-responsive" style="width:100%;"></a>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 gallery">
+                    <img src="{{ url_for('static', filename='img/logos/heroku.jpg') }}" class="img-responsive" style="width:100%;"></a>
+                </div>
+<!--                <div class="col-lg-4 col-md-4 col-sm-4 gallery">
+                    <img src="{{ url_for('static', filename='img/logos/graphlab.png') }}" class="img-responsive" style="width:100%;"></a>-->
+                </div>
+            </div>
+
         </div>
+
+        <br>
         <hr>
-        <div id="how-works">
+        <div class = "container centered" id="how-works">
             <h1>How does it work?</h1>
             <p>
                 The recommender system is based on a method called <strong>collaborative filtering</strong>.
@@ -88,7 +109,7 @@
                 The recommender's job is to predict which scores the user would give the unrated games.
             </p>
             <br>
-            <img src="{{ url_for('static', filename='img/recsys_matrix_sm.png') }}" style="width:1000px;padding-bottom:15px;">
+            <img src="{{ url_for('static', filename='img/recsys_matrix_sm.png') }}" style="width:75%;padding-bottom:15px;">
             <br>
             <p>
                 From the above ratings, we might say that User 1 likes any game related to <i>Settlers of Catan</i>,
@@ -104,7 +125,7 @@
                 which best capture the ratings data. Each user and game are weighted by how well these features represent them.
             </p>
             <br>
-            <img src="{{ url_for('static', filename='img/recsys_sm.png') }}" style="width:1000px;padding-bottom:15px;">
+            <img src="{{ url_for('static', filename='img/recsys_sm.png') }}" style="width:750px;padding-bottom:15px;">
             <br>
             <p>
                 The learned features give us a compact way to represent user/game pairs. To find out which games we

@@ -122,6 +122,9 @@ def get_filtered_games(filter_dict):
 
     if 'family' in filter_dict:
         fam = filter_dict['family']
+        # for demo
+        if fam == 'Game of Thrones':
+            fam = 'A Song of Ice and Fire'
         if fam.find("'") != -1:
             fam = fam.replace("'","''")
 
@@ -351,7 +354,7 @@ def update_explorer():
     x_axis = request.args.get("xaxis")
     y_axis = request.args.get("yaxis")
 
-    p = Figure(plot_height=600, plot_width=800, title="", toolbar_location=None, tools=[hover])
+    p = Figure(plot_height=600, plot_width=750, title="", toolbar_location=None, tools=[hover])
     p.circle(x="x", y="y", source=source, size=7, color="color", line_color=None, fill_alpha=0.25)
 
     def select_games():
