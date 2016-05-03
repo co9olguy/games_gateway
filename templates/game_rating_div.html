@@ -1,0 +1,35 @@
+<script>
+  //rating selector
+  $(function() {
+    $( "#game-{{objectid}}-slider" ).slider({
+      min: 1,
+      max: 5,
+      values: [ 3 ],
+      // update backend with this rating
+      stop: function( event, ui ) {
+        $.getJSON($SCRIPT_ROOT + '/_add_rating', {
+            objectid: '{{objectid}}',
+            rating: $( "#game-{{objectid}}-slider" ).slider( "values", 0 ),
+        }, function(data) {
+            $("#game-{{objectid}}-msg").text(data.msg);
+        });
+        return true
+      }
+    });
+  });
+
+</script>
+
+
+<div class="col-lg-4 col-md-4 col-sm-4 gallery" style="height:250px;">
+    <div style="height:200px">
+        <img src="{{ img }}">
+        <h4>{{ name }}</h4>
+        <p id="game-{{objectid}}-msg">Rating: 3</p>
+        <div class="centered" id="game-{{objectid}}-slider" style="width:100px;height:10px;"></div>
+
+    </div>
+    <p>
+
+    </p>
+</div>
