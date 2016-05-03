@@ -399,7 +399,7 @@ def update_explorer():
     update(None, None, None)  # initial view
 
     script, div = components(p)
-    return jsonify(plot=render_template('tmp.html',script=script, div=div), flag = 0)
+    return jsonify(plot=render_template('explore_plot.html',script=script, div=div), flag = 0)
 
 if __name__ == '__main__':
     app.run(port=33507)
