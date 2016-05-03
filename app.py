@@ -219,7 +219,7 @@ def recommend():
 
 
     # recommender logic goes here...
-    if request.args.get('usernamecheck', type=str) == 'off' and (len(rated_games) == 0 or
+    if request.args.get('usernamecheck', 'off', type=str) == 'off' and (len(rated_games) == 0 or
                                                                  request.args.get('ignoreratings', type=str) == 'on') or \
                                                                  use_gl==False: # recommend by popularity
         if request.args.get('ignoreratings', type=str) == 'on':

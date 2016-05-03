@@ -101,8 +101,8 @@ $(function() {
         useage: $( '#age-check:checked' ).val(),
         usecategory: $( '#category-check:checked' ).val(),
         usefamily: $( '#family-check:checked' ).val(),
-        ignoreratings: $( '#ignore-ratings-check:checked' ).val(),
-        usernamecheck: $( '#bgg-username-check:checked' ).val()
+        ignoreratings: $( '#ignore-ratings-check:checked' ).val()
+        //usernamecheck: $( '#bgg-username-check:checked' ).val()
       },
 
       //display returned data
