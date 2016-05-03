@@ -1,5 +1,5 @@
-DEMO = True
-use_gl = True
+USE_LOCAL_DEMO_DB = False
+use_gl = False
 
 import numpy as np
 import pandas as pd
@@ -22,7 +22,7 @@ from bokeh.embed import components
 import logging
 import sys
 
-if DEMO:
+if USE_LOCAL_DEMO_DB:
     engine = sqlite3.connect('workspace/bgg_demo.sqlite')
 else:
     DATABASE_URL = 'postgres://xsguljepueowms:IR7-TicHebWDkYr0WGZngcVsa5@ec2-23-21-157-223.compute-1.amazonaws.com:5432/d95o8es4f7241o'
@@ -195,6 +195,7 @@ def fetch_ratings_game():
 def recommend():
 
     global rated_games
+    global use_gl
 
     # apply filters based on user selections
     filter = {}
@@ -219,9 +220,12 @@ def recommend():
 
     # recommender logic goes here...
     if request.args.get('usernamecheck', type=str) == 'off' and (len(rated_games) == 0 or
-                                                                 request.args.get('ignoreratings', type=str) == 'on' or
-                                                                 use_gl==False): # recommend by popularity
-        rec_games = filtered_games
+                                                                 request.args.get('ignoreratings', type=str) == 'on') or \
+                                                                 use_gl==False: # recommend by popularity
+        if request.args.get('ignoreratings', type=str) == 'on':
+            rec_games = filtered_games
+        else:
+            rec_games = filtered_games[~filtered_games['objectid'].isin(rated_games['objectid'])]
     else: #use ratings to recommend
         if request.args.get('usernamecheck', type=str) == 'on':
             rec_username = request.args.get('username', type=str)
