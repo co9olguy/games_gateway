@@ -23,5 +23,5 @@ Live version available at [gamesgateway.herokuapp.com
 - Web hosting
     - Heroku
 
-Data courtesy of [boardgamegeek.com](boardgamegeek.com).
+Data courtesy of [boardgamegeek.com](http://www.boardgamegeek.com).
 
