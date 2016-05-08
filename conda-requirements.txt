@@ -2,4 +2,4 @@ nomkl
 numpy
 pandas
 bokeh
-sklearn
+scikit-learn
