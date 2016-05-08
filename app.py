@@ -3,6 +3,7 @@ use_gl = False
 
 import numpy as np
 import pandas as pd
+from sklearn.linear_model import LinearRegression
 from sqlalchemy import create_engine
 from bokeh.plotting import Figure
 from bokeh.models import Range1d, ColumnDataSource, HoverTool
@@ -21,6 +22,10 @@ from bokeh.embed import components
 
 import logging
 import sys
+
+item_matrix = pd.read_csv('static/item_matrix.csv')
+NUM_RECS = 27
+NUM_RECS_SHOWN = 9
 
 if USE_LOCAL_DEMO_DB:
     engine = sqlite3.connect('workspace/bgg_demo.sqlite')
@@ -220,38 +225,64 @@ def recommend():
 
     # recommender logic goes here...
     if request.args.get('usernamecheck', 'off', type=str) == 'off' and (len(rated_games) == 0 or
-                                                                 request.args.get('ignoreratings', type=str) == 'on') or \
-                                                                 use_gl==False: # recommend by popularity
+                                                                 request.args.get('ignoreratings', type=str) == 'on'):
+        # recommend by popularity
         if request.args.get('ignoreratings', type=str) == 'on':
             rec_games = filtered_games
         else:
             rec_games = filtered_games[~filtered_games['objectid'].isin(rated_games['objectid'])]
-    else: #use ratings to recommend
-        if request.args.get('usernamecheck', type=str) == 'on':
-            rec_username = request.args.get('username', type=str)
-        else:
-            rec_username = 'gg_web_user_dummy'
-        filtered_games_SFrame = gl.SFrame(filtered_games[['objectid']])
-        filtered_games_SFrame.rename({'objectid':'item_id'}) # recommender system needs this format
-        if request.args.get('ignoreratings', type=str) == 'on':
-            new_obs_data = gl.SFrame({'user_name' : [],
-                                      'item_id' : [],
-                                      'rating' : []})
-        else:
-            new_obs_data = gl.SFrame({'user_name' : [rec_username]*len(rated_games),
-                                      'item_id' : [int(o) for o in rated_games['objectid']],
-                                      'rating' : [2*rating for rating in rated_games['rating']]}) # bgg scores are 1-10
+    else:
+        # use recommender model
 
-        recommendations_SFrame = model.recommend([rec_username],
-                                          new_observation_data = new_obs_data, k=27,
-                                          diversity = 0,
-                                          items=gl.SFrame(filtered_games_SFrame))
-        recommendations_SFrame.rename({'item_id': 'objectid'})
-        recommendations_df = recommendations_SFrame.to_dataframe()
-        rec_games = pd.merge(recommendations_df, filtered_games, how='inner', on=['objectid'])
+        if use_gl: # use graphlab for recommendations
 
+            if request.args.get('usernamecheck', type=str) == 'on':
+                rec_username = request.args.get('username', type=str)
+            else:
+                rec_username = 'gg_web_user_dummy'
+            filtered_games_SFrame = gl.SFrame(filtered_games[['objectid']])
+            filtered_games_SFrame.rename({'objectid':'item_id'}) # recommender system needs this format
 
-    CUTOFF = min(9, len(rec_games.index))
+            if request.args.get('ignoreratings', type=str) == 'on':
+                new_obs_data = gl.SFrame({'user_name' : [],
+                                          'item_id' : [],
+                                          'rating' : []})
+            else:
+                new_obs_data = gl.SFrame({'user_name' : [rec_username]*len(rated_games),
+                                          'item_id' : [int(o) for o in rated_games['objectid']],
+                                          'rating' : [2*rating for rating in rated_games['rating']]}) # bgg scores are 1-10
+
+            recommendations_SFrame = model.recommend([rec_username],
+                                              new_observation_data = new_obs_data, k=NUM_RECS,
+                                              diversity = 0,
+                                              items=gl.SFrame(filtered_games_SFrame))
+            recommendations_SFrame.rename({'item_id': 'objectid'})
+            recommendations_df = recommendations_SFrame.to_dataframe()
+            rec_games = pd.merge(recommendations_df, filtered_games, how='inner', on=['objectid'])
+
+        else: # use scikit-learn for recommendations
+
+            if request.args.get('usernamecheck', type=str) == 'on':
+                rec_username = request.args.get('username', type=str)
+            else:
+                rec_username = 'gg_web_user_dummy'
+
+            y = rated_games['rating'].values
+            rated_games_ids = rated_games['objectid'].values
+            rated_games_features = item_matrix[item_matrix['item_id'].isin(rated_games_ids)]
+            factors_list = ['factors.{}'.format(n) for n in range(8)]
+            X = rated_games_features[factors_list].as_matrix()
+            regr = LinearRegression()
+            regr.fit(X,y)
+            user_intercept = regr.intercept_
+            user_features = regr.coef_
+
+            filtered_games_features = item_matrix[item_matrix['item_id'].isin(filtered_games['objectid'])]
+            predicted_ratings = regr.predict(filtered_games_features[factors_list])
+            filtered_games['prediction'] = predicted_ratings
+            rec_games = filtered_games.sort_values(by='prediction', ascending=False)[0:NUM_RECS]
+
+    CUTOFF = min(NUM_RECS_SHOWN, len(rec_games.index))
     rec_games = rec_games[0:CUTOFF]
     rec_games['link'] = rec_games['objectid'].apply(lambda objectid: 'http://boardgamegeek.com/boardgame/{}'.format(objectid))
     rec_games['img'] = rec_games['thumbnail'].apply(lambda thumbnail: 'http:{}'.format(thumbnail))
