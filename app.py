@@ -276,7 +276,7 @@ def recommend():
             regr.fit(X,y)
             user_intercept = regr.intercept_
             user_features = regr.coef_
-
+            filtered_games = filtered_games[~filtered_games['objectid'].isin(rated_games['objectid'])]
             filtered_games_features = item_matrix[item_matrix['item_id'].isin(filtered_games['objectid'])]
             predicted_ratings = regr.predict(filtered_games_features[factors_list])
             filtered_games['prediction'] = predicted_ratings
