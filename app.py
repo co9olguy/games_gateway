@@ -320,7 +320,7 @@ def add_rating():
     rating = request.args.get('rating', type=float)
     rated_games.loc[rated_games['objectid'] == objectid, 'rating']=rating
     print rated_games
-    return jsonify(msg = 'Rating: {}'.format(int(rating)))
+    return jsonify(msg = 'Rating: {}'.format(float(rating)))
 
 @app.route('/about')
 def about():

@@ -1,3 +1,4 @@
+
 <script>
   //rating selector
   $(function() {
@@ -18,6 +19,24 @@
     });
   });
 
+
+  //rating selector
+  $(function() {
+    $( "#game-{{objectid}}-stars" ).rateYo({
+      rating: 2.5,
+      // update backend with this rating
+      onSet: function( rating, rateYoInstance ) {
+        $.getJSON($SCRIPT_ROOT + '/_add_rating', {
+            objectid: '{{objectid}}',
+            rating: rating,
+        }, function(data) {
+            $("#game-{{objectid}}-msg").text(data.msg);
+        });
+        return true
+      }
+    });
+  });
+
 </script>
 
 
@@ -25,9 +44,9 @@
     <div style="height:200px">
         <img src="{{ img }}">
         <h4>{{ name }}</h4>
-        <p id="game-{{objectid}}-msg">Rating: 3</p>
-        <div class="centered" id="game-{{objectid}}-slider" style="width:100px;height:10px;"></div>
-
+        <p id="game-{{objectid}}-msg">Rating: 2.5</p>
+        <!--<div class="centered" id="game-{{objectid}}-slider" style="width:100px;height:10px;"></div>-->
+        <div class="centered" id="game-{{objectid}}-stars" style="width:100px;height:10px;"></div>
     </div>
     <p>
 
