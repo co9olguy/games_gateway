@@ -9,6 +9,9 @@ Live version available at [gamesgateway.herokuapp.com
 
 ## Technical stack:
 
+- Machine Learning
+    - GraphLab
+    - Scikit-Learn
 - Server backend
     - Python
     - PostgreSQL
@@ -22,6 +25,7 @@ Live version available at [gamesgateway.herokuapp.com
     - Bootstrap 
 - Web hosting
     - Heroku
+    - Amazon Web Services
 
 Data courtesy of [boardgamegeek.com](http://www.boardgamegeek.com).
 
