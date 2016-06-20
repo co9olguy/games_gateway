@@ -11,17 +11,18 @@ from bokeh.embed import components
 from bokeh.models.widgets import HBox, Slider, VBoxForm, Select, TextInput
 from bokeh.io import curdoc
 import sqlite3
-
-if use_gl:
-    import graphlab as gl
-    #model = gl.load_model('model/gl_model')
-    model = gl.load_model('model/model_12ft_lr0.01_iter1000')
+from flask import Flask, render_template, request, redirect, jsonify
 
 from bokeh.plotting import figure, show, output_file, ColumnDataSource
 from bokeh.embed import components
 
 import logging
 import sys
+
+if use_gl:
+    import graphlab as gl
+    #model = gl.load_model('model/gl_model')
+    model = gl.load_model('model/model_12ft_lr0.01_iter1000')
 
 item_matrix = pd.read_csv('static/item_matrix.csv')
 NUM_RECS = 27
@@ -32,8 +33,6 @@ if USE_LOCAL_DEMO_DB:
 else:
     DATABASE_URL = 'postgres://xsguljepueowms:IR7-TicHebWDkYr0WGZngcVsa5@ec2-23-21-157-223.compute-1.amazonaws.com:5432/d95o8es4f7241o'
     engine = create_engine(DATABASE_URL)
-
-from flask import Flask, render_template, request, redirect, jsonify
 
 app = Flask(__name__)
 
@@ -71,9 +70,6 @@ def create_recs_page(recs_df, show_page=True):
            text_baseline='middle')  # game player limits
     p.text(x=np.array(x_locs) + size + margin * 2, y=np.array(y_locs) - size / 2 - text_margin, text=playtimes,
            text_baseline='middle')  # game playtimes
-
-    # if show_page:
-    #    show(p)
 
     script, div = components(p)
 
@@ -159,9 +155,7 @@ def get_filtered_games(filter_dict):
 
 @app.route('/_fetch_ratings_game')
 def fetch_ratings_game():
-
     global rated_games
-
     logging.basicConfig(level=logging.INFO)
     # get the logger for the current Python module
     log = logging.getLogger(__name__)
@@ -198,10 +192,8 @@ def fetch_ratings_game():
 
 @app.route('/_recommend')
 def recommend():
-
     global rated_games
     global use_gl
-
     # apply filters based on user selections
     filter = {}
     if request.args.get('useplayers', type=str) == 'on':
@@ -221,7 +213,6 @@ def recommend():
         if family_args is not None and family_args != '':
             filter['family'] = family_args
     filtered_games = get_filtered_games(filter)
-
 
     # recommender logic goes here...
     if request.args.get('usernamecheck', 'off', type=str) == 'off' and (len(rated_games) == 0 or
@@ -290,11 +281,8 @@ def recommend():
     # display results
     if rec_games.empty:
         return jsonify(result='Nothing here', return_string='Sorry, no games found matching your criteria. Try a less restrictive search', flag=-1)
-
     else:
-
         recs_html = render_template('game_rec_div.html', recs_dict = rec_games[['link','img','name','minplayers','maxplayers','minplaytime','maxplaytime']].to_dict(orient='split'))
-
 
         return jsonify(recs_html =  recs_html, flag=0 )
 
@@ -332,10 +320,6 @@ def explorer_page():
 
 @app.route('/_explore')
 def update_explorer():
-    #query = "SELECT * FROM games WHERE rank <= 100 LIMIT 100"
-    #DATABASE_URL = 'postgres://xsguljepueowms:IR7-TicHebWDkYr0WGZngcVsa5@ec2-23-21-157-223.compute-1.amazonaws.com:5432/d95o8es4f7241o'
-    #engine = create_engine(DATABASE_URL)
-    #games = pd.read_sql_query(query, engine)
     games = pd.read_csv('static/games_full.csv')
 
     games["color"] = "blue"
@@ -373,7 +357,6 @@ def update_explorer():
             </section>
             """)
 
-    #name = TextInput(title="Name contains")
     x_axis = Select(title="X Axis", options=ordered_keys, value="Year Published")
     y_axis = Select(title="Y Axis", options=ordered_keys, value="Average boardgamegeek Rating")
 
@@ -394,19 +377,15 @@ def update_explorer():
 
     def select_games():
         selected = games[
-            #(games["yearpublished"] >= year.value) &
-            (games["maxplayers"] <= filter['maxplayers']) &
-            (games["minplayers"] >= filter['minplayers']) &
-            (games["maxplaytime"] <= filter['maxplaytime']) &
-            (games["minplaytime"] >= filter['minplaytime']) &
-            (games["yearpublished"] >= filter['minyear']) &
-            (games["yearpublished"] <= filter['maxyear']) &
-            (games["minage"] >= filter['minage']) &
-            (games["rank"] <= filter['rank'])
-            ]
-        #name_val = name.value.strip()
-        #if (name_val != ""):
-        #    selected = selected[selected.name.str.contains(name_val) == True]
+                        (games["maxplayers"] <= filter['maxplayers']) &
+                        (games["minplayers"] >= filter['minplayers']) &
+                        (games["maxplaytime"] <= filter['maxplaytime']) &
+                        (games["minplaytime"] >= filter['minplaytime']) &
+                        (games["yearpublished"] >= filter['minyear']) &
+                        (games["yearpublished"] <= filter['maxyear']) &
+                        (games["minage"] >= filter['minage']) &
+                        (games["rank"] <= filter['rank'])
+                        ]
         return selected
 
     def update(attrname, old, new):
